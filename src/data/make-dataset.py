@@ -181,12 +181,39 @@ def _merge_rob_mac_scoring(masterdb : pd.DataFrame, rob_mac_sas_path: Path, rob_
     masterdb['RobMacQualScore'] = masterdb['RobMacQ1'] + masterdb['RobMacQ2'] + masterdb['RobMacQ3']
     return masterdb
 
+def _impute_macrob_score_for_imperfect_matches(df: pd.DataFrame):
+    dPerfect = df[df['perfectMatch'] == "TRUE"]
+    dNonPerfect = df[df['perfectMatch'] == "FALSE"]
+
+    df['Q1'] = dNonPerfect['RobMacQ1']
+    df['Q2'] = dNonPerfect['RobMacQ2']
+    df['Q3'] = dNonPerfect['RobMacQ3']
+    df['QUAL'] = dNonPerfect['RobMacQualScore']
+
+    # now fill the blanks from the original ratings.
+    # it does not matter getting P1 or P2 score as they are perfect match
+    df['Q1'].fillna(dPerfect['q1p1T'], inplace=True)
+    df['Q2'].fillna(dPerfect['q2p1T'], inplace=True)
+    df['Q3'].fillna(dPerfect['q3p1T'], inplace=True)
+    df['QUAL'].fillna(dPerfect['P1QualScore'], inplace=True)
+
+    #calculate sum of qual scores and compare with the previous manually summed values to determine if they check out.
+    df['summedQs'] = df['Q1']+df['Q2']+df['Q3']
+    comparison_QUALScore_columns = np.where(df['summedQs'] == df['QUAL'], True, False)
+    df["isQUALequal"] = comparison_QUALScore_columns
+    # for those that don't replace with the calculated qual scores
+    df.loc[(df.isQUALequal == False),'QUAL'] = df['summedQs']
+    # get rid of helper columns
+    df.drop(['summedQs', 'isQUALequal'], axis=1, inplace=True)
+
+    return df 
+
 def main(mac_path: Path = typer.Option('data/raw/comments/mcmaster-database-de-identified-comments.xlsx', exists=True, dir_okay=False), 
          sas_path: Path = typer.Option('data/raw/comments/sask-database-de-identified-comments.xlsx', exists=True, dir_okay=False),
          qual_dir: Path = typer.Option('data/raw/qual-ratings/', exists=True, dir_okay=True, file_okay=False),
          rob_mac_mac_path: Path = typer.Option('data/raw/rob-mac-qual-ratings/mcmaster-database-with-numerical-qual-scores.xlsx', exists=True, dir_okay=False),
          rob_mac_sas_path: Path = typer.Option('data/raw/rob-mac-qual-ratings/sask-database-with-numerical-qual-scores.xlsx', exists=True, dir_okay=False),
-         output_path: Path = typer.Option('data/interim/masterdb.xlsx')):
+         output_path: Path = typer.Option('data/processed/masterdb.xlsx')):
     
     # open the Mac/Sask raw data and merge them into one file
     masterdb = _open_and_merge(mac_path, sas_path, qual_dir)
@@ -196,6 +223,9 @@ def main(mac_path: Path = typer.Option('data/raw/comments/mcmaster-database-de-i
 
     # add the corrected QuAL scores from Rob & Mac
     masterdb = _merge_rob_mac_scoring(masterdb, rob_mac_sas_path, rob_mac_mac_path)
+
+    # impute the corrected QuAL scores from above if they don't match
+    masterdb = _impute_macrob_score_for_imperfect_matches(masterdb)
 
     # output the result
     masterdb.to_excel(output_path)
