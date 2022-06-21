@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import typer 
 from pathlib import Path
+import logging as log
 
 def _open_and_merge(mac_path : Path, sas_path : Path, qual_dir : Path):
     sasdf = pd.read_excel(sas_path)
@@ -201,6 +202,8 @@ def _impute_macrob_score_for_imperfect_matches(df: pd.DataFrame):
     df['summedQs'] = df['Q1']+df['Q2']+df['Q3']
     comparison_QUALScore_columns = np.where(df['summedQs'] == df['QUAL'], True, False)
     df["isQUALequal"] = comparison_QUALScore_columns
+    log.info(f'Number of manually summed columns that equal auto-summed QuAL scores:\n{df["isQUALequal"].value_counts()}')
+    log.info('Unequal will be replaced by auto-summed QuAL scores.')
     # for those that don't replace with the calculated qual scores
     df.loc[(df.isQUALequal == False),'QUAL'] = df['summedQs']
     # get rid of helper columns
@@ -213,21 +216,32 @@ def main(mac_path: Path = typer.Option('data/raw/comments/mcmaster-database-de-i
          qual_dir: Path = typer.Option('data/raw/qual-ratings/', exists=True, dir_okay=True, file_okay=False),
          rob_mac_mac_path: Path = typer.Option('data/raw/rob-mac-qual-ratings/mcmaster-database-with-numerical-qual-scores.xlsx', exists=True, dir_okay=False),
          rob_mac_sas_path: Path = typer.Option('data/raw/rob-mac-qual-ratings/sask-database-with-numerical-qual-scores.xlsx', exists=True, dir_okay=False),
-         output_path: Path = typer.Option('data/processed/masterdb.xlsx')):
-    
+         output_path: Path = typer.Option('data/processed/masterdb.xlsx'),
+         log_level: str = typer.Option('INFO')):
+
+    params = locals()
+    log.basicConfig(level=log_level)
+    log.info("Generating final dataset from raw data...")
+    log.debug(f"Parameters:\n{params}")
+        
     # open the Mac/Sask raw data and merge them into one file
+    log.info('Merging Mac and Sask data...')
     masterdb = _open_and_merge(mac_path, sas_path, qual_dir)
 
     # calculate the QuAL scores from the responeses in the merged data
+    log.info('Calculating QuAL scores...')
     masterdb = _process_qual_score(masterdb)
 
     # add the corrected QuAL scores from Rob & Mac
+    log.info('Correcting QuAL scores with Rob/Mac hand-coding...')
     masterdb = _merge_rob_mac_scoring(masterdb, rob_mac_sas_path, rob_mac_mac_path)
 
     # impute the corrected QuAL scores from above if they don't match
+    log.info('Imputing corrected scores where necessary...')
     masterdb = _impute_macrob_score_for_imperfect_matches(masterdb)
 
     # output the result
+    log.info(f'Saving to {output_path}')
     masterdb.to_excel(output_path)
 
 if __name__ == '__main__':
