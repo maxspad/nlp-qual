@@ -71,7 +71,7 @@ def _add_demog_cols(masterdb: pd.DataFrame, mac_path: Path, sas_path: Path):
 def main(masterdb_path: Path = typer.Option('data/raw/masterdbFromRobMac.xlsx', exists=True, dir_okay=False),
          mac_path: Path = typer.Option('data/raw/mcmaster-database-de-identified-comments.xlsx', exists=True, dir_okay=False),
          sas_path: Path = typer.Option('data/raw/sask-database-de-identified-comments.xlsx', exists=True, dir_okay=False),
-         output_path: Path = typer.Option('data/processed/masterdbForNLP.xlsx'),
+         output_path: Path = typer.Option('data/interim/masterdbForNLP.xlsx'),
          log_level: str = typer.Option('INFO')):
 
     params = locals()

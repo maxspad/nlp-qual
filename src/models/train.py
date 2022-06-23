@@ -3,7 +3,7 @@ from statistics import mode
 from matplotlib.pyplot import text
 import pandas as pd
 import numpy as np
-from skspacy import SpacyTransformer, SpacyTokenFilter, SpacyDocFeats
+from ..skspacy import SpacyTokenFilter, SpacyDocFeats
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
@@ -26,12 +26,9 @@ def int_to_bool(value: int):
 true_opt = typer.Option(1, min=0, max=1, callback=int_to_bool)
 false_opt = typer.Option(0, min=0, max=1, callback=int_to_bool)
 
-def main(train_path: Path = typer.Option('data/processed/train.csv', exists=True, dir_okay=False),
-         text_var : str = 'comment',
+def main(train_path: Path = typer.Option('data/processed/train.pkl', exists=True, dir_okay=False),
+         text_var : str = 'comment_spacy',
          target_var : str = 'Q2',
-         spacy_model : str = 'en_core_web_sm',
-         spacy_procs : int = typer.Option(4, min=-1, max=8),
-         progress_bar : bool = True,
          random_seed : int = 43,
          punct : int = true_opt,
          pron: int = true_opt,
@@ -55,17 +52,17 @@ def main(train_path: Path = typer.Option('data/processed/train.csv', exists=True
     log.debug(f"Parameters:\n{params}")
     
     log.info(f'Loading data from {train_path}')
-    df = pd.read_csv(train_path)
+    df = pd.read_pickle(train_path)
     log.info(f'Data is shape {df.shape}')
     log.info(f'There are {df[text_var].isna().sum()} blanks in {text_var}, dropping')
     log.info(f'There are {df[target_var].isna().sum()} blanks in {target_var}, dropping')
     df = df.dropna(subset=[text_var, target_var])
     log.debug(f'Data head\n{df.head()}')
 
-    X = df[text_var].values.copy()[:, None].astype('str')
-    spacytf = SpacyTransformer(spacy_model=spacy_model, procs=spacy_procs, prog=progress_bar)
-    log.info(f'Processing text with spacy model {spacy_model}...')
-    X = spacytf.fit_transform(X)
+    X = df[text_var].values.copy()[:, None]
+    # spacytf = SpacyTransformer(spacy_model=spacy_model, procs=spacy_procs, prog=progress_bar)
+    # log.info(f'Processing text with spacy model {spacy_model}...')
+    # X = spacytf.fit_transform(X)
     y = df[target_var].values.copy()
     y = y + 1
     y[y == 2] = 0
