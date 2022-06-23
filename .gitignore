@@ -88,3 +88,6 @@ target/
 # non-original data files
 data/interim/
 data/processed/
+
+# hydra outputs
+outputs/

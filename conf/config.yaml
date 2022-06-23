@@ -1,0 +1,26 @@
+make_dataset:
+  masterdb_path: data/raw/masterdbFromRobMac.xlsx
+  mac_path: data/raw/mcmaster-database-de-identified-comments.xlsx
+  sas_path: data/raw/sask-database-de-identified-comments.xlsx
+  output_path: data/interim/masterdbForNLP.xlsx
+
+proc_spacy:
+  dataset_path: data/interim/masterdbForNLP.xlsx
+  output_path: data/interim/masterdbForNLPSpacyProc.pkl
+  text_var: comment
+  spacy_model: en_core_web_sm
+  spacy_procs: 4
+  progress_bar: True
+
+split_train_test:
+  dataset_path: data/interim/masterdbForNLPSpacyProc.pkl
+  output_dir: data/processed
+  train_path: ${split_train_test.output_dir}/train.pkl
+  test_path: ${split_train_test.output_dir}/test.pkl
+  test_size: 0.15
+  random_state: 43
+  train_file_name: train.pkl
+  test_file_name: test.pkl
+
+
+

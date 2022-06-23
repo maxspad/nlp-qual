@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
-import typer 
 from pathlib import Path
-import logging as log
 
+import hydra
+from omegaconf import DictConfig, OmegaConf
+
+import logging
+log = logging.getLogger(__name__)
 
 def _impute_macrob_score_for_imperfect_matches(df: pd.DataFrame):
     dPerfect = df[df['perfectMatch'] == True]
@@ -68,20 +71,16 @@ def _add_demog_cols(masterdb: pd.DataFrame, mac_path: Path, sas_path: Path):
 
     return df
 
-def main(masterdb_path: Path = typer.Option('data/raw/masterdbFromRobMac.xlsx', exists=True, dir_okay=False),
-         mac_path: Path = typer.Option('data/raw/mcmaster-database-de-identified-comments.xlsx', exists=True, dir_okay=False),
-         sas_path: Path = typer.Option('data/raw/sask-database-de-identified-comments.xlsx', exists=True, dir_okay=False),
-         output_path: Path = typer.Option('data/interim/masterdbForNLP.xlsx'),
-         log_level: str = typer.Option('INFO')):
+@hydra.main(version_base=None, config_path="../../conf", config_name="config")
+def main(cfg : DictConfig):
+    cfg = cfg.make_dataset
 
-    params = locals()
-    log.basicConfig(level=log_level)
     log.info("Generating final dataset...")
-    log.debug(f"Parameters:\n{params}")
+    log.debug(f"Parameters:\n{cfg}")
     
     # load the raw data
-    log.info(f"Loading masterdb  from {masterdb_path}")
-    masterdb = pd.read_excel(masterdb_path,  index_col=0)
+    log.info(f"Loading masterdb  from {cfg.masterdb_path}")
+    masterdb = pd.read_excel(cfg.masterdb_path,  index_col=0)
     log.debug(f'Shape is {masterdb.shape}')
 
     # impute the corrected QuAL scores from above if they don't match
@@ -90,12 +89,11 @@ def main(masterdb_path: Path = typer.Option('data/raw/masterdbFromRobMac.xlsx', 
 
     # add in demographic columns
     log.info('Merging in demographic columns from raw data...')
-    masterdb = _add_demog_cols(masterdb, mac_path, sas_path)
+    masterdb = _add_demog_cols(masterdb, cfg.mac_path, cfg.sas_path)
 
     # output the result
-    log.info(f'Saving to {output_path}')
-    masterdb.to_excel(output_path)
+    log.info(f'Saving to {cfg.output_path}')
+    masterdb.to_excel(cfg.output_path)
 
 if __name__ == '__main__':
-    typer.run(main)
-    exit(0)
+    main()
