@@ -278,4 +278,9 @@ dependencies:
   - zipp=3.8.0
   - zlib=1.2.12
   - zstd=1.5.2
+  - pip:
+    - antlr4-python3-runtime==4.9.3
+    - en-core-web-sm==3.3.0
+    - hydra-core==1.2.0
+    - omegaconf==2.2.2
 prefix: /home/maxspad/mambaforge/envs/nlp-qual-max
