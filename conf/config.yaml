@@ -22,5 +22,26 @@ split_train_test:
   train_file_name: train.pkl
   test_file_name: test.pkl
 
+train:
+  train_path: ${split_train_test.train_path}
+  text_var: ${proc_spacy.text_var}_spacy
+  target_var: Q2
+  random_seed: 43
+  punct: True
+  pron: True
+  stop: False
+  lemma: False
+  ngram_min: 1
+  ngram_max: 2
+  max_df: 1.0
+  min_df: 1
+  token_count: True
+  pos_counts: False
+  ent_counts: False
+  vectors: False
+  model_c: 0.01
+  class_weight: 'balanced'
+
+
 
 

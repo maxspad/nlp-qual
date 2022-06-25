@@ -1,82 +1,58 @@
-from audioop import cross
-from statistics import mode
-from matplotlib.pyplot import text
+from importlib_metadata import version
 import pandas as pd
-import numpy as np
+
+# Spacy NLP / sklearn
 from ..skspacy import SpacyTokenFilter, SpacyDocFeats
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from sklearn.svm import LinearSVC, LinearSVR
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-
-from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV, cross_validate
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.svm import LinearSVC
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import cross_validate
 import sklearn.metrics as mets
-from sklearn.metrics import get_scorer_names
 
-
-import typer
-import logging as log
-from pathlib import Path
+# configuration management
+import hydra
+from omegaconf import DictConfig, OmegaConf
+import logging
+log = logging.getLogger(__name__)
 
 def int_to_bool(value: int):
     return True if value else False
 
-true_opt = typer.Option(1, min=0, max=1, callback=int_to_bool)
-false_opt = typer.Option(0, min=0, max=1, callback=int_to_bool)
+@hydra.main(version_base=None, config_path='../../conf', config_name='config')
+def main(cfg : DictConfig):
+    cfg = cfg.train 
 
-def main(train_path: Path = typer.Option('data/processed/train.pkl', exists=True, dir_okay=False),
-         text_var : str = 'comment_spacy',
-         target_var : str = 'Q2',
-         random_seed : int = 43,
-         punct : int = true_opt,
-         pron: int = true_opt,
-         stop: int = false_opt,
-         lemma: int = false_opt,
-         ngram_min: int = 1,
-         ngram_max: int = 2,
-         max_df: float = 1.0,
-         min_df: int = 1,
-         token_count: int = true_opt,
-         pos_counts: int = false_opt,
-         ent_counts: int = false_opt,
-         vectors: int = false_opt,
-         model_c: float = 0.01,
-         class_weight: str = 'balanced',
-         log_level: str = "INFO"):
-
-    params = locals()
-    log.basicConfig(level=log_level)
     log.info('Training model...')
-    log.debug(f"Parameters:\n{params}")
+    log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
     
-    log.info(f'Loading data from {train_path}')
-    df = pd.read_pickle(train_path)
+    log.info(f'Loading data from {cfg.train_path}')
+    df = pd.read_pickle(cfg.train_path)
     log.info(f'Data is shape {df.shape}')
-    log.info(f'There are {df[text_var].isna().sum()} blanks in {text_var}, dropping')
-    log.info(f'There are {df[target_var].isna().sum()} blanks in {target_var}, dropping')
-    df = df.dropna(subset=[text_var, target_var])
+    log.info(f'There are {df[cfg.text_var].isna().sum()} blanks in {cfg.text_var}, dropping')
+    log.info(f'There are {df[cfg.target_var].isna().sum()} blanks in {cfg.target_var}, dropping')
+    df = df.dropna(subset=[cfg.text_var, cfg.target_var])
     log.debug(f'Data head\n{df.head()}')
 
-    X = df[text_var].values.copy()[:, None]
+    X = df[cfg.text_var].values.copy()[:, None]
     # spacytf = SpacyTransformer(spacy_model=spacy_model, procs=spacy_procs, prog=progress_bar)
     # log.info(f'Processing text with spacy model {spacy_model}...')
     # X = spacytf.fit_transform(X)
-    y = df[target_var].values.copy()
+    y = df[cfg.target_var].values.copy()
     y = y + 1
     y[y == 2] = 0
     log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
-    mdl = LinearSVC(C=model_c, class_weight=class_weight, random_state=random_seed)
+    mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed)
     pipe = Pipeline((
         ('ct', ColumnTransformer((
             ('bowpipe', Pipeline((
-                ('tokfilt', SpacyTokenFilter(punct=punct, lemma=lemma, stop=stop, pron=pron)),
-                ('vec', CountVectorizer(max_df=max_df, min_df=min_df, ngram_range=(ngram_min, ngram_max))),
+                ('tokfilt', SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)),
+                ('vec', CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))),
             )), [0]),
             ('docfeatspipe', Pipeline((
-                ('docfeats', SpacyDocFeats(token_count=token_count, pos_counts=pos_counts, ent_counts=ent_counts, vectors=vectors)),
+                ('docfeats', SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)),
                 ('scaler', MinMaxScaler())
             )), [0])
         ))),
@@ -118,4 +94,4 @@ def _model_scorer(clf, X, y):
     }
 
 if __name__ == "__main__":
-    typer.run(main)
+    main()
