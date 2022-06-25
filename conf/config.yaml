@@ -23,6 +23,8 @@ split_train_test:
   test_file_name: test.pkl
 
 train:
+  mlflow_tracking_dir: ./mlruns
+  mlflow_experiment_name: manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
   target_var: Q2

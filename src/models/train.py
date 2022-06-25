@@ -17,6 +17,9 @@ from omegaconf import DictConfig, OmegaConf
 import logging
 log = logging.getLogger(__name__)
 
+# mlflow
+import mlflow
+
 def int_to_bool(value: int):
     return True if value else False
 
@@ -24,53 +27,55 @@ def int_to_bool(value: int):
 def main(cfg : DictConfig):
     cfg = cfg.train 
 
-    log.info('Training model...')
-    log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
-    
-    log.info(f'Loading data from {cfg.train_path}')
-    df = pd.read_pickle(cfg.train_path)
-    log.info(f'Data is shape {df.shape}')
-    log.info(f'There are {df[cfg.text_var].isna().sum()} blanks in {cfg.text_var}, dropping')
-    log.info(f'There are {df[cfg.target_var].isna().sum()} blanks in {cfg.target_var}, dropping')
-    df = df.dropna(subset=[cfg.text_var, cfg.target_var])
-    log.debug(f'Data head\n{df.head()}')
+    mlflow.set_experiment(experiment_name=cfg.mlflow_experiment_name)
+    with mlflow.start_run():
+        log.info('Training model...')
+        log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
+        mlflow.log_params(OmegaConf.to_object(cfg))
+        
+        log.info(f'Loading data from {cfg.train_path}')
+        df = pd.read_pickle(cfg.train_path)
+        log.info(f'Data is shape {df.shape}')
+        log.info(f'There are {df[cfg.text_var].isna().sum()} blanks in {cfg.text_var}, dropping')
+        log.info(f'There are {df[cfg.target_var].isna().sum()} blanks in {cfg.target_var}, dropping')
+        df = df.dropna(subset=[cfg.text_var, cfg.target_var])
+        log.debug(f'Data head\n{df.head()}')
 
-    X = df[cfg.text_var].values.copy()[:, None]
-    # spacytf = SpacyTransformer(spacy_model=spacy_model, procs=spacy_procs, prog=progress_bar)
-    # log.info(f'Processing text with spacy model {spacy_model}...')
-    # X = spacytf.fit_transform(X)
-    y = df[cfg.target_var].values.copy()
-    y = y + 1
-    y[y == 2] = 0
-    log.debug(f'X shape {X.shape} / y shape {y.shape}')
+        X = df[cfg.text_var].values.copy()[:, None]
+        y = df[cfg.target_var].values.copy()
+        y = y + 1
+        y[y == 2] = 0
+        log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
-    mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed)
-    pipe = Pipeline((
-        ('ct', ColumnTransformer((
-            ('bowpipe', Pipeline((
-                ('tokfilt', SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)),
-                ('vec', CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))),
-            )), [0]),
-            ('docfeatspipe', Pipeline((
-                ('docfeats', SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)),
-                ('scaler', MinMaxScaler())
-            )), [0])
-        ))),
-        ('mdl', mdl)
-    ))
-    log.debug(f'Pipeline is\n{pipe}')
+        mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed)
+        pipe = Pipeline((
+            ('ct', ColumnTransformer((
+                ('bowpipe', Pipeline((
+                    ('tokfilt', SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)),
+                    ('vec', CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))),
+                )), [0]),
+                ('docfeatspipe', Pipeline((
+                    ('docfeats', SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)),
+                    ('scaler', MinMaxScaler())
+                )), [0])
+            ))),
+            ('mdl', mdl)
+        ))
+        log.debug(f'Pipeline is\n{pipe}')
 
 
-    log.info('Fitting model...')
-    res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1)
-    res = pd.DataFrame(res)
-    res_mn = pd.DataFrame(res.mean()).T.rename(lambda x: 'mean_' + x, axis=1)
-    res_std = pd.DataFrame(res.std()).T.rename(lambda x: 'std_' + x, axis=1)
-    print(res)
-    print()
-    print(res_mn)
-    print()
-    print(res_std)
+        log.info('Fitting model...')
+        res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1)
+        res = pd.DataFrame(res)
+        res_mn = pd.DataFrame(res.mean()).T.rename(lambda x: 'mean_' + x, axis=1)
+        res_std = pd.DataFrame(res.std()).T.rename(lambda x: 'std_' + x, axis=1)
+        mlflow.log_metrics(res_mn.iloc[0,:].to_dict())
+        mlflow.log_metrics(res_std.iloc[0,:].to_dict())
+        print(res)
+        print()
+        print(res_mn)
+        print()
+        print(res_std)
 
 
 def _model_scorer(clf, X, y):
