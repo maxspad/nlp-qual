@@ -5,7 +5,7 @@ make_dataset:
   output_path: data/interim/masterdbForNLP.xlsx
 
 proc_spacy:
-  dataset_path: data/interim/masterdbForNLP.xlsx
+  dataset_path: ${make_dataset.output_path}
   output_path: data/interim/masterdbForNLPSpacyProc.pkl
   text_var: comment
   spacy_model: en_core_web_sm
@@ -13,7 +13,7 @@ proc_spacy:
   progress_bar: True
 
 split_train_test:
-  dataset_path: data/interim/masterdbForNLPSpacyProc.pkl
+  dataset_path: ${proc_spacy.output_path}
   output_dir: data/processed
   train_path: ${split_train_test.output_dir}/train.pkl
   test_path: ${split_train_test.output_dir}/test.pkl
