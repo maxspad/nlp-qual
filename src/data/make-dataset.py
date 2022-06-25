@@ -76,7 +76,7 @@ def main(cfg : DictConfig):
     cfg = cfg.make_dataset
 
     log.info("Generating final dataset...")
-    log.debug(f"Parameters:\n{cfg}")
+    log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
     
     # load the raw data
     log.info(f"Loading masterdb  from {cfg.masterdb_path}")
