@@ -64,19 +64,24 @@ def main(cfg : DictConfig):
         log.debug(f'Pipeline is\n{pipe}')
 
 
-        log.info('Fitting model...')
+        log.info('Cross validating model...')
         res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1)
+
         res = pd.DataFrame(res)
         res_mn = pd.DataFrame(res.mean()).T.rename(lambda x: 'mean_' + x, axis=1)
         res_std = pd.DataFrame(res.std()).T.rename(lambda x: 'std_' + x, axis=1)
         mlflow.log_metrics(res_mn.iloc[0,:].to_dict())
         mlflow.log_metrics(res_std.iloc[0,:].to_dict())
-        print(res)
-        print()
-        print(res_mn)
-        print()
-        print(res_std)
+        log.info(f'Cross validation results:\n{res}\n{res_mn}\n{res_std}')
 
+        mlflow.log_text(res.to_csv(),'fold_results.csv')
+        mlflow.log_text(res_mn.to_csv(),'res_mn.csv')
+        mlflow.log_text(res_std.to_csv(),'res_std.csv')
+
+        log.info('Fitting final model...')
+        pipe.fit(X, y)     
+        log.info('Saving final model...')   
+        mlflow.sklearn.log_model(pipe, 'model')
 
 def _model_scorer(clf, X, y):
     p = clf.predict(X)
