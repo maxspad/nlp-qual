@@ -23,6 +23,7 @@ split_train_test:
   test_file_name: test.pkl
 
 train:
+  conda_yaml_path: './conda.yaml'
   mlflow_tracking_dir: ./mlruns
   mlflow_experiment_name: manual
   train_path: ${split_train_test.train_path}

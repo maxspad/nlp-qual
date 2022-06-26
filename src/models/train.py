@@ -20,10 +20,11 @@ log = logging.getLogger(__name__)
 # mlflow
 import mlflow
 
-def int_to_bool(value: int):
-    return True if value else False
+CONF_PATH = '../../conf'
+CONFIG_NAME = 'config'
+CONFIG_FILE = f'{CONF_PATH}/{CONFIG_NAME}.yaml'
 
-@hydra.main(version_base=None, config_path='../../conf', config_name='config')
+@hydra.main(version_base=None, config_path=CONF_PATH, config_name=CONFIG_NAME)
 def main(cfg : DictConfig):
     cfg = cfg.train 
 
@@ -77,6 +78,8 @@ def main(cfg : DictConfig):
         mlflow.log_text(res.to_csv(),'fold_results.csv')
         mlflow.log_text(res_mn.to_csv(),'res_mn.csv')
         mlflow.log_text(res_std.to_csv(),'res_std.csv')
+        mlflow.log_artifact(cfg.conda_yaml_path)
+        mlflow.log_artifact(CONFIG_FILE)
 
         log.info('Fitting final model...')
         pipe.fit(X, y)     
