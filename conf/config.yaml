@@ -45,6 +45,23 @@ train:
   model_c: 0.01
   class_weight: 'balanced'
 
+defaults:
+  - override hydra/sweeper: optuna
+  - override hydra/sweeper/sampler: random
+
+hydra:
+  sweeper:
+    sampler:
+      seed: 43
+    direction: maximize
+    study_name: test_study
+    storage: null
+    n_trials: 5
+    n_jobs: 1
+    params:
+      train.ngram_max: range(1,4)
+      train.model_c: choice(0.1,0.01,0.001,0.0001)
+
 
 
 

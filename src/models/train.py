@@ -87,6 +87,8 @@ def main(cfg : DictConfig):
         log.info('Saving final model...')   
         mlflow.sklearn.log_model(pipe, 'model')
 
+        return res_mn['mean_test_balanced_accuracy']
+
 def _model_scorer(clf, X, y):
     p = clf.predict(X)
     s = clf.decision_function(X)
