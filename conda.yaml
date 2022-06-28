@@ -286,6 +286,7 @@ dependencies:
     - cmd2==2.4.1
     - colorlog==6.6.0
     - en-core-web-sm==3.3.0
+    - hydra-colorlog==1.2.0
     - hydra-core==1.2.0
     - hydra-joblib-launcher==1.2.0
     - hydra-optuna-sweeper==1.2.0
