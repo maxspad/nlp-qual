@@ -49,20 +49,31 @@ def main(cfg : DictConfig):
         y[y == 2] = 0
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
+        tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
+        vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
+        docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
+        scaler = MinMaxScaler()
         mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed)
-        pipe = Pipeline((
-            ('ct', ColumnTransformer((
-                ('bowpipe', Pipeline((
-                    ('tokfilt', SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)),
-                    ('vec', CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))),
-                )), [0]),
-                ('docfeatspipe', Pipeline((
-                    ('docfeats', SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)),
-                    ('scaler', MinMaxScaler())
-                )), [0])
-            ))),
-            ('mdl', mdl)
-        ))
+        if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
+            pipe = Pipeline((
+                ('tokfilt', tokfilt),
+                ('vec', vec),
+                ('mdl', mdl)
+            ))
+        else:
+            pipe = Pipeline((
+                ('ct', ColumnTransformer((
+                    ('bowpipe', Pipeline((
+                        ('tokfilt', tokfilt),
+                        ('vec', vec)
+                    )), [0]),
+                    ('docfeatspipe', Pipeline((
+                        ('docfeats', docfeats),
+                        ('scaler', scaler)
+                    )), [0])
+                ))),
+                ('mdl', mdl)
+            ))
         log.debug(f'Pipeline is\n{pipe}')
 
 
