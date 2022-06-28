@@ -91,3 +91,7 @@ data/processed/
 
 # hydra outputs
 outputs/
+multirun/
+
+# mlflow
+mlruns/
