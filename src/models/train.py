@@ -1,5 +1,6 @@
-from importlib_metadata import version
 import pandas as pd
+
+import warnings
 
 # Spacy NLP / sklearn
 from ..skspacy import SpacyTokenFilter, SpacyDocFeats
@@ -10,6 +11,7 @@ from sklearn.svm import LinearSVC
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import cross_validate
 import sklearn.metrics as mets
+from sklearn.exceptions import ConvergenceWarning
 
 # configuration management
 import hydra
@@ -53,7 +55,7 @@ def main(cfg : DictConfig):
         vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
         docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
         scaler = MinMaxScaler()
-        mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed)
+        mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
         if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
             pipe = Pipeline((
                 ('tokfilt', tokfilt),
@@ -78,13 +80,19 @@ def main(cfg : DictConfig):
 
 
         log.info('Cross validating model...')
-        res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1)
+        n_failed_converge = 0
+        res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1, return_estimator=True)
+        n_failed_converge = sum([estim[-1].n_iter_ >= estim[-1].get_params()['max_iter'] for estim in res['estimator']])
+        if n_failed_converge > 0:
+            log.warning(f'{n_failed_converge} folds failed to converge!')
+        del res['estimator']
 
         res = pd.DataFrame(res)
         res_mn = pd.DataFrame(res.mean()).T.rename(lambda x: 'mean_' + x, axis=1)
         res_std = pd.DataFrame(res.std()).T.rename(lambda x: 'std_' + x, axis=1)
         mlflow.log_metrics(res_mn.iloc[0,:].to_dict())
         mlflow.log_metrics(res_std.iloc[0,:].to_dict())
+        mlflow.log_metric('n_failed_converge', n_failed_converge)
         log.info(f'Cross validation results:\n{res}\n{res_mn}\n{res_std}')
 
         mlflow.log_text(res.to_csv(),'fold_results.csv')

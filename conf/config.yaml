@@ -43,6 +43,7 @@ train:
   ent_counts: False
   vectors: False
   model_c: 0.01
+  max_iter: 1000
   class_weight: 'balanced'
 
 defaults:
