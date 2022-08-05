@@ -108,11 +108,8 @@ def main(cfg : DictConfig):
 
         return res_mn['mean_test_balanced_accuracy']
 
-def _model_scorer(clf, X, y):
-    p = clf.predict(X)
-    s = clf.decision_function(X)
+def calculate_metrics(y, p, s):
     cm = mets.confusion_matrix(y, p)
-
     return {
         'balanced_accuracy': mets.balanced_accuracy_score(y, p),
         'accuracy': mets.accuracy_score(y, p),
@@ -127,6 +124,26 @@ def _model_scorer(clf, X, y):
         # 'confusion': mets.confusion_matrix(y, p),
         # 'clfrep': mets.classification_report(y, p)
     }
+def _model_scorer(clf, X, y):
+    p = clf.predict(X)
+    s = clf.decision_function(X)
+    return calculate_metrics(y, p, s)
+    # cm = mets.confusion_matrix(y, p)
+
+    # return {
+    #     'balanced_accuracy': mets.balanced_accuracy_score(y, p),
+    #     'accuracy': mets.accuracy_score(y, p),
+    #     'roc_auc': mets.roc_auc_score(y, s),
+    #     'f1': mets.f1_score(y, p),
+    #     'precision': mets.precision_score(y, p),
+    #     'recall': mets.recall_score(y, p),
+    #     'tp': cm[0,0],
+    #     'tn': cm[1,1],
+    #     'fp': cm[0,1],
+    #     'fn': cm[1,0],
+    #     # 'confusion': mets.confusion_matrix(y, p),
+    #     # 'clfrep': mets.classification_report(y, p)
+    # }
 
 if __name__ == "__main__":
     main()
