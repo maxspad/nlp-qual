@@ -25,10 +25,11 @@ split_train_test:
 train:
   conda_yaml_path: './conda.yaml'
   mlflow_tracking_dir: ./mlruns
-  mlflow_experiment_name: manual
+  mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
-  target_var: Q2
+  target_var: Q3
+  invert_target: False
   random_seed: 43
   punct: True
   pron: True
@@ -51,7 +52,8 @@ test:
   mlflow_source_experiment_name: hparam_simplification
   mlflow_run_id: 8a2417c0ca784c12a4cccd8abca64a58
   test_path: ${split_train_test.test_path}
-  target_var: Q2
+  target_var: ${train.target_var}
+  invert_target: ${train.invert_target}
   mlflow_target_experiment_name: test
 
 defaults:

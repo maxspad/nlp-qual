@@ -45,7 +45,8 @@ def main(cfg: DictConfig):
 
         X = df[['comment_spacy']].values.copy()
         y = df[cfg.target_var].values.copy()
-        y = (y - 1) * -1 # invert
+        if cfg.invert_target:
+            y = (y - 1) * -1 # invert
         p = clf.predict(X)
         s = clf.decision_function(X)
 

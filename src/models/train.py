@@ -47,8 +47,9 @@ def main(cfg : DictConfig):
 
         X = df[cfg.text_var].values.copy()[:, None]
         y = df[cfg.target_var].values.copy()
-        y = y + 1
-        y[y == 2] = 0
+        if cfg.invert_target:
+            y = y + 1
+            y[y == 2] = 0
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
         tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
