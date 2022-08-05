@@ -46,6 +46,14 @@ train:
   max_iter: 10000
   class_weight: 'balanced'
 
+test:
+  mlflow_dir: mlruns
+  mlflow_source_experiment_name: hparam_simplification
+  mlflow_run_id: 8a2417c0ca784c12a4cccd8abca64a58
+  test_path: ${split_train_test.test_path}
+  target_var: Q2
+  mlflow_target_experiment_name: test
+
 defaults:
   - override hydra/sweeper: optuna
   - override hydra/sweeper/sampler: random
