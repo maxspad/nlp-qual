@@ -50,6 +50,7 @@ def main(cfg : DictConfig):
         if cfg.invert_target:
             y = y + 1
             y[y == 2] = 0
+        log.info(f'Y value counts\n{pd.Series(y).value_counts().sort_index()}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
         tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
@@ -118,10 +119,11 @@ def calculate_metrics(y, p, s):
         'f1': mets.f1_score(y, p),
         'precision': mets.precision_score(y, p),
         'recall': mets.recall_score(y, p),
-        'tp': cm[0,0],
-        'tn': cm[1,1],
+        'tp': cm[1,1],
+        'tn': cm[0,0],
         'fp': cm[0,1],
         'fn': cm[1,0],
+        # 'confusion': str(cm)
         # 'confusion': mets.confusion_matrix(y, p),
         # 'clfrep': mets.classification_report(y, p)
     }

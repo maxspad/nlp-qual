@@ -29,7 +29,7 @@ train:
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
   target_var: Q3
-  invert_target: False
+  invert_target: True
   random_seed: 43
   punct: True
   pron: True
@@ -49,8 +49,8 @@ train:
 
 test:
   mlflow_dir: mlruns
-  mlflow_source_experiment_name: 220805_115357_Q3_sweep_1000trial_random
-  mlflow_run_id: 57efaf413c8d457ebca84d6474b10770
+  mlflow_source_experiment_name: 220809_102311_Q3_1000t_rand_inv
+  mlflow_run_id: 9598a48f12ef4e11b0be907cbe4eb898
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
@@ -71,7 +71,7 @@ hydra:
     study_name: test_study
     storage: null
     n_trials: 1000
-    n_jobs: 16
+    n_jobs: 14
     params:
       train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
       train.model_c: choice(1,0.1,0.01,0.001,0.0001)
