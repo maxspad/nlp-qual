@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 import warnings
 
@@ -47,10 +48,17 @@ def main(cfg : DictConfig):
 
         X = df[cfg.text_var].values.copy()[:, None]
         y = df[cfg.target_var].values.copy()
+        y_value_counts = pd.Series(y).value_counts().sort_index()
+        multi_level = len(y_value_counts) > 2
+        if multi_level:
+            log.warning(f'Target {cfg.target_var} has {len(y_value_counts)} levels! Metrics will be multi-level.')
         if cfg.invert_target:
-            y = y + 1
-            y[y == 2] = 0
-        log.info(f'Y value counts\n{pd.Series(y).value_counts().sort_index()}')
+            if multi_level:
+                log.warning(f'Cannot invert a multi-level target! Ignoring')
+            else:
+                y = y + 1
+                y[y == 2] = 0
+        log.info(f'Y value counts\n{y_value_counts}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
         tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
@@ -112,41 +120,43 @@ def main(cfg : DictConfig):
 
 def calculate_metrics(y, p, s):
     cm = mets.confusion_matrix(y, p)
-    return {
+    n_classes = cm.shape[0]
+    avg = 'binary' if n_classes == 2 else 'macro'
+    toret = {
         'balanced_accuracy': mets.balanced_accuracy_score(y, p),
         'accuracy': mets.accuracy_score(y, p),
-        'roc_auc': mets.roc_auc_score(y, s),
-        'f1': mets.f1_score(y, p),
-        'precision': mets.precision_score(y, p),
-        'recall': mets.recall_score(y, p),
-        'tp': cm[1,1],
-        'tn': cm[0,0],
-        'fp': cm[0,1],
-        'fn': cm[1,0],
-        # 'confusion': str(cm)
-        # 'confusion': mets.confusion_matrix(y, p),
-        # 'clfrep': mets.classification_report(y, p)
+        'roc_auc': mets.roc_auc_score(y, s) if n_classes == 2 else np.nan,
+        'f1': mets.f1_score(y, p, average=avg),
+        'precision': mets.precision_score(y, p, average=avg),
+        'recall': mets.recall_score(y, p, average=avg),
     }
+
+    if n_classes == 2:
+        toret['tp'] = cm[1,1]
+        toret['tn'] = cm[0,0]
+        toret['fp'] = cm[0,1]
+        toret['fn'] = cm[1,0]
+    else:
+        precs, recs, f1s, supps = mets.precision_recall_fscore_support(y, p, average=None, labels=list(range(n_classes)))
+        for c, prfs in enumerate(zip(precs, recs, f1s, supps)):
+        # for c in range(n_classes):
+            # prec, rec, f1, supp = mets.precision_recall_fscore_support(y, p, average='binary', pos_label=c)
+            prec, rec, f1, supp = prfs
+            toret[f'prec_{c}'] = prec
+            toret[f'rec_{c}'] = rec
+            toret[f'f1_{c}'] = f1 
+            toret[f'supp_{c}'] = supp
+            
+            for j, v in enumerate(cm[c, :]):
+                toret[f'cm_{c}_{j}'] = v
+            toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2)
+            toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3)
+    return toret 
+
 def _model_scorer(clf, X, y):
     p = clf.predict(X)
     s = clf.decision_function(X)
     return calculate_metrics(y, p, s)
-    # cm = mets.confusion_matrix(y, p)
-
-    # return {
-    #     'balanced_accuracy': mets.balanced_accuracy_score(y, p),
-    #     'accuracy': mets.accuracy_score(y, p),
-    #     'roc_auc': mets.roc_auc_score(y, s),
-    #     'f1': mets.f1_score(y, p),
-    #     'precision': mets.precision_score(y, p),
-    #     'recall': mets.recall_score(y, p),
-    #     'tp': cm[0,0],
-    #     'tn': cm[1,1],
-    #     'fp': cm[0,1],
-    #     'fn': cm[1,0],
-    #     # 'confusion': mets.confusion_matrix(y, p),
-    #     # 'clfrep': mets.classification_report(y, p)
-    # }
 
 if __name__ == "__main__":
     main()
