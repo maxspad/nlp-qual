@@ -55,6 +55,9 @@ test:
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
   mlflow_target_experiment_name: ${train.target_var}_test
+  conda_yaml_path: ${train.conda_yaml_path}
+  posthoc: True
+  n_top: 15
 
 defaults:
   - override hydra/sweeper: optuna
