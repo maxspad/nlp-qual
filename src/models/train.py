@@ -1,5 +1,7 @@
+from pyclbr import Function
 import pandas as pd
 import numpy as np
+import pickle
 
 import warnings
 
@@ -61,33 +63,37 @@ def main(cfg : DictConfig):
         log.info(f'Y value counts\n{y_value_counts}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
-        tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
-        vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
-        docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
-        scaler = MinMaxScaler()
-        mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
-        if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
-            pipe = Pipeline((
-                ('tokfilt', tokfilt),
-                ('vec', vec),
-                ('mdl', mdl)
-            ))
-        else:
-            pipe = Pipeline((
-                ('ct', ColumnTransformer((
-                    ('bowpipe', Pipeline((
-                        ('tokfilt', tokfilt),
-                        ('vec', vec)
-                    )), [0]),
-                    ('docfeatspipe', Pipeline((
-                        ('docfeats', docfeats),
-                        ('scaler', scaler)
-                    )), [0])
-                ))),
-                ('mdl', mdl)
-            ))
-        log.debug(f'Pipeline is\n{pipe}')
 
+        pipe_steps_QUAL = get_pipe_steps_for_QUAL(cfg)
+        pipe_steps_subvars = get_pipe_steps_for_subvars(cfg)
+        
+
+        # Add the model to the pipeline at the end
+        mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
+        if cfg.target_var == 'QUAL':
+            log.info(f'Target {cfg.target_var}, subtype {cfg.qual_fit_type}')
+            if cfg.qual_fit_type == 'both':
+                pipe = Pipeline((
+                    ('ctouter', ColumnTransformer((
+                        ('submodels', Pipeline(pipe_steps_QUAL), [0]),
+                        ('text', Pipeline(pipe_steps_subvars), [0])
+                    ))),
+                    ('mdl', mdl)
+                ))
+            elif cfg.qual_fit_type == 'text':
+                pipe_steps = pipe_steps_subvars + [('mdl', mdl)]
+                pipe = Pipeline(pipe_steps)
+            elif cfg.qual_fit_type == 'submodels':
+                pipe_steps = pipe_steps_QUAL + [('mdl', mdl)]
+                pipe = Pipeline(pipe_steps)
+            else:
+                raise ValueError('qual_fit_type must be one of text/submodels/both')
+        else:            
+            log.info(f'Target {cfg.target_var}')
+            pipe_steps = pipe_steps_subvars + [('mdl', mdl)]
+            pipe = Pipeline(pipe_steps)
+        
+        log.info(f'Pipeline is\n{pipe}')
 
         log.info('Cross validating model...')
         n_failed_converge = 0
@@ -118,6 +124,69 @@ def main(cfg : DictConfig):
 
         return res_mn['mean_test_balanced_accuracy']
 
+def submodel_function(sm):
+    def _submodel_func(X, y=None):
+        df = sm.decision_function(X)
+        if len(df.shape) < 2:
+            df = df[:, None]
+        # print(df.shape)
+        return df
+    return _submodel_func
+
+from sklearn.preprocessing import FunctionTransformer
+
+def load_submodel(mlflow_dir, mlflow_exp_name, mlflow_run_id):
+    # Load the trained model
+    exper = mlflow.get_experiment_by_name(mlflow_exp_name)
+    log.info(f'Loaded experiment {mlflow_exp_name} with ID {exper.experiment_id} at artifact location {exper.artifact_location}')
+    model_loc = f'{mlflow_dir}/{exper.experiment_id}/{mlflow_run_id}/artifacts/model/model.pkl'
+    log.info(f'Loading model from {model_loc}')
+    with open(model_loc, 'rb') as f:
+        clf = pickle.load(f)
+    return clf
+
+def get_pipe_steps_for_QUAL(cfg: DictConfig):
+    log.info('Loading submodels...')
+    q1 = load_submodel(cfg.mlflow_dir, cfg.q1_mlflow_exp_name, cfg.q1_mlflow_run_id)
+    q2 = load_submodel(cfg.mlflow_dir, cfg.q2_mlflow_exp_name, cfg.q2_mlflow_run_id)
+    q3 = load_submodel(cfg.mlflow_dir, cfg.q3_mlflow_exp_name, cfg.q3_mlflow_run_id)
+    
+    pipe_steps = [
+        ('ct', ColumnTransformer((
+            ('q1ft', FunctionTransformer(submodel_function(q1)), [0]),
+            ('q2ft', FunctionTransformer(submodel_function(q2)), [0]),
+            ('q3ft', FunctionTransformer(submodel_function(q3)), [0])
+        ))),
+        ('scaler', MinMaxScaler()),
+    ]
+    return pipe_steps
+
+def get_pipe_steps_for_subvars(cfg: DictConfig):
+    tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
+    vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
+    docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
+    scaler = MinMaxScaler()
+    # mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
+    if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
+        pipe_steps = [
+            ('tokfilt', tokfilt),
+            ('vec', vec)
+        ]
+    else:
+        pipe_steps = [
+            ('ct', ColumnTransformer((
+                ('bowpipe', Pipeline((
+                    ('tokfilt', tokfilt),
+                    ('vec', vec)
+                )), [0]),
+                ('docfeatspipe', Pipeline((
+                    ('docfeats', docfeats),
+                    ('scaler', scaler)
+                )), [0])
+            )))
+        ]
+    return pipe_steps
+
 def calculate_metrics(y, p, s):
     cm = mets.confusion_matrix(y, p)
     n_classes = cm.shape[0]
@@ -129,6 +198,7 @@ def calculate_metrics(y, p, s):
         'f1': mets.f1_score(y, p, average=avg),
         'precision': mets.precision_score(y, p, average=avg),
         'recall': mets.recall_score(y, p, average=avg),
+        'mae': mets.mean_absolute_error(y, p)
     }
 
     if n_classes == 2:

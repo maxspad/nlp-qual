@@ -23,12 +23,13 @@ split_train_test:
   test_file_name: test.pkl
 
 train:
+  mlflow_dir: mlruns
   conda_yaml_path: './conda.yaml'
   mlflow_tracking_dir: ./mlruns
   mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
-  target_var: Q1
+  target_var: QUAL
   invert_target: True
   random_seed: 43
   punct: True
@@ -47,8 +48,17 @@ train:
   max_iter: 10000
   class_weight: 'balanced'
 
+  q1_mlflow_exp_name: 220812_123209_q1_10000t_random
+  q1_mlflow_run_id: 059651b7006d4e0099fdf410fad12532
+  q2_mlflow_exp_name: hparam_simplification
+  q2_mlflow_run_id: 8a2417c0ca784c12a4cccd8abca64a58
+  q3_mlflow_exp_name: 220809_102311_Q3_1000t_rand_inv
+  q3_mlflow_run_id: 9598a48f12ef4e11b0be907cbe4eb898
+  qual_fit_type: 'submodels' # text/submodels/both
+  
+
 test:
-  mlflow_dir: mlruns
+  mlflow_dir: ${train.mlflow_dir}
   mlflow_source_experiment_name: 220812_123209_q1_10000t_random
   mlflow_run_id: 059651b7006d4e0099fdf410fad12532
   test_path: ${split_train_test.test_path}

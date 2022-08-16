@@ -1,5 +1,4 @@
 # configuration management
-import imp
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import logging
@@ -11,6 +10,7 @@ import mlflow
 # NLP/ML
 import pickle
 import pandas as pd 
+import numpy as np
 import src.models.train as train 
 
 # displays
@@ -51,8 +51,16 @@ def main(cfg: DictConfig):
 
         X = df[['comment_spacy']].values.copy()
         y = df[cfg.target_var].values.copy()
+        y_value_counts = pd.Series(y).value_counts().sort_index()
+        multi_level = len(y_value_counts) > 2
+        if multi_level:
+            log.warning(f'Target {cfg.target_var} has {len(y_value_counts)} levels! Metrics will be multi-level.')
         if cfg.invert_target:
-            y = (y - 1) * -1 # invert
+            if multi_level:
+                log.warning(f'Cannot invert a multi-level target! Ignoring')
+            else:
+                y = y + 1
+                y[y == 2] = 0
         p = clf.predict(X)
         s = clf.decision_function(X)
 
