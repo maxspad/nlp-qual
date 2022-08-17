@@ -54,13 +54,15 @@ train:
   q2_mlflow_run_id: 8a2417c0ca784c12a4cccd8abca64a58
   q3_mlflow_exp_name: 220809_102311_Q3_1000t_rand_inv
   q3_mlflow_run_id: 9598a48f12ef4e11b0be907cbe4eb898
-  qual_fit_type: 'submodels' # text/submodels/both
+  qual_text_mlflow_exp_name: QUAL_manual
+  qual_text_mlflow_run_id: e1a1cb95017a499b81f2335c0733ec48
+  qual_fit_type: 'simultaneous' # text_only/submodels_only/simultaneous/text_first
   
 
 test:
   mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: 220812_123209_q1_10000t_random
-  mlflow_run_id: 059651b7006d4e0099fdf410fad12532
+  mlflow_source_experiment_name: QUAL_manual
+  mlflow_run_id: 7d14d0dcd76b4d3b9970d1c9c055c439
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
@@ -83,7 +85,7 @@ hydra:
     direction: maximize
     study_name: test_study
     storage: null
-    n_trials: 10000
+    n_trials: 1000
     n_jobs: 14
     params:
       train.mlflow_experiment_name: sweep_random_100_test_yes_vectors

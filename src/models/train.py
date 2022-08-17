@@ -72,7 +72,7 @@ def main(cfg : DictConfig):
         mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
         if cfg.target_var == 'QUAL':
             log.info(f'Target {cfg.target_var}, subtype {cfg.qual_fit_type}')
-            if cfg.qual_fit_type == 'both':
+            if cfg.qual_fit_type == 'simultaneous':
                 pipe = Pipeline((
                     ('ctouter', ColumnTransformer((
                         ('submodels', Pipeline(pipe_steps_QUAL), [0]),
@@ -80,14 +80,14 @@ def main(cfg : DictConfig):
                     ))),
                     ('mdl', mdl)
                 ))
-            elif cfg.qual_fit_type == 'text':
+            elif cfg.qual_fit_type == 'text_only':
                 pipe_steps = pipe_steps_subvars + [('mdl', mdl)]
                 pipe = Pipeline(pipe_steps)
-            elif cfg.qual_fit_type == 'submodels':
+            elif (cfg.qual_fit_type == 'submodels_only') or (cfg.qual_fit_type == 'text_first'):
                 pipe_steps = pipe_steps_QUAL + [('mdl', mdl)]
                 pipe = Pipeline(pipe_steps)
             else:
-                raise ValueError('qual_fit_type must be one of text/submodels/both')
+                raise ValueError('qual_fit_type must be one of text_only/submodels_only/simultaneous/text_first')
         else:            
             log.info(f'Target {cfg.target_var}')
             pipe_steps = pipe_steps_subvars + [('mdl', mdl)]
@@ -150,13 +150,15 @@ def get_pipe_steps_for_QUAL(cfg: DictConfig):
     q1 = load_submodel(cfg.mlflow_dir, cfg.q1_mlflow_exp_name, cfg.q1_mlflow_run_id)
     q2 = load_submodel(cfg.mlflow_dir, cfg.q2_mlflow_exp_name, cfg.q2_mlflow_run_id)
     q3 = load_submodel(cfg.mlflow_dir, cfg.q3_mlflow_exp_name, cfg.q3_mlflow_run_id)
-    
+    submodels = [q1, q2, q3]
+    sm_names = ['q1','q2','q3']
+    if cfg.qual_fit_type == 'text_first':
+        submodels.append(load_submodel(cfg.mlflow_dir, cfg.qual_text_mlflow_exp_name, cfg.qual_text_mlflow_run_id))
+        sm_names.append('qt')
+
+    ct_steps = [(f'{n}ft', FunctionTransformer(submodel_function(sm)), [0]) for n, sm in zip(sm_names, submodels)]
     pipe_steps = [
-        ('ct', ColumnTransformer((
-            ('q1ft', FunctionTransformer(submodel_function(q1)), [0]),
-            ('q2ft', FunctionTransformer(submodel_function(q2)), [0]),
-            ('q3ft', FunctionTransformer(submodel_function(q3)), [0])
-        ))),
+        ('ct', ColumnTransformer(ct_steps)),
         ('scaler', MinMaxScaler()),
     ]
     return pipe_steps
