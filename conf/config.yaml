@@ -61,14 +61,14 @@ train:
 
 test:
   mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: QUAL_manual
-  mlflow_run_id: 7d14d0dcd76b4d3b9970d1c9c055c439
+  mlflow_source_experiment_name: 220816_141727_QUAL_textonly_1000t
+  mlflow_run_id: 7d2a1247779e412291bf73d31ba6fb47
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
   mlflow_target_experiment_name: ${train.target_var}_test
   conda_yaml_path: ${train.conda_yaml_path}
-  posthoc: True
+  posthoc: False
   n_top: 15
 
 defaults:
