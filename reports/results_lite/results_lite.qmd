@@ -1,0 +1,162 @@
+---
+title: "NLP-QuAL Results"
+format:
+  html:
+    toc: true
+    echo: false
+jupyter: python3
+---
+```{python}
+### Imports
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from IPython.display import display, Markdown
+
+def md(s : str):
+    display(Markdown(s))
+
+def count_and_percent(df: pd.DataFrame, col : str):
+    qc = pd.DataFrame(df[col].value_counts()).sort_index().rename({col:'Count'}, axis=1)
+    qcn = (qc / len(df) * 100).rename({'Count':'Percent of Total'}, axis=1)
+    return pd.concat([qc, qcn], axis=1)
+
+### Load Data
+df = pd.read_pickle('../../data/interim/masterdbForNLPSpacyProc.pkl')
+train = pd.read_pickle('../../data/processed/train.pkl')
+test = pd.read_pickle('../../data/processed/test.pkl')
+```
+## Data Characteristics/Demographics
+```{python}
+#| echo: false
+md(f"""
+We analyzed {len(df)} evaluations, with {len(df[df['dataSource'] == 'Mac'])} from Site 1 (McMaster) and {len(df[df['dataSource'] == 'Sas'])} from Site 2 (Saskatchewan). 
+""")
+```
+
+For each evaluation, the QuAL score was rated by two separate raters. Each sub-score (Q1, Q2, and Q3) was rated and then summed to get the final QuAL score. Discrepancies were broken by members of the study team (who?) 
+
+```{python} 
+md(f"""The average QuAL score was {df['QUAL'].mean()}, with standard deviation 
+{df['QUAL'].std():.3f}, median {df['QUAL'].median()}""")
+```
+
+Descriptive statistics for the subscores and QuAL Score were:
+```{python}
+cols = ['Q1','Q2','Q3','QUAL']
+df[cols].describe().loc[['count','mean','std','50%'],:]
+```
+
+### Score Distributions
+
+#### Subscores
+The table below shows the count and associated percent for each level of each subscore.
+```{python}
+pd.concat({
+    'Q1':count_and_percent(df, 'Q1'),
+    'Q2':count_and_percent(df, 'Q2'),
+    'Q3':count_and_percent(df, 'Q3')
+}, axis=1)
+```
+The distribution for the subscores is plotted below
+```{python}
+#| layout-ncol: 3
+#| fig-cap: Distribution of QuAL Subscores
+#| fig-subcap: 
+#|  - "Q1"
+#|  - "Q2"
+#|  - "Q3"
+f = sns.countplot(x='Q1', hue='dataSource', data=df)
+plt.show(f)
+f2 = sns.countplot(x='Q2', hue='dataSource', data=df)
+plt.show(f2)
+f3 = sns.countplot(x='Q3', hue='dataSource', data=df)
+plt.show(f3)
+```
+Evaluations tended to score highly (> 2) on Q1, but poorly (80% 0 and 83% 0, respectively) on Q2 and Q3. There were large differences in scores between the two sites.
+
+#### QuAL Score
+The table below shows the raw counts and percentages associated with each level of the rated QuAL score.
+```{python}
+count_and_percent(df, 'QUAL')
+```
+
+The distribution of the QuAL score is plotted below:
+```{python}
+plt.show(sns.countplot(x='QUAL', hue='dataSource', data=df))
+```
+
+This table shows the counts/frequencies for each possible combination of subscores. For each possible final QuAL score, the table shows the combination fo subscores most likely to generate that QuAL score.
+```{python}
+vc = df[cols].value_counts(normalize=False)
+vc = pd.DataFrame(vc).reset_index()
+vc = vc.set_index(['QUAL','Q1','Q2','Q3'])
+vc = vc.sort_index().rename({0:'Count'}, axis=1)
+vc = pd.concat([vc, (vc / 2500 * 100).rename({'Count':'Percent of Total'}, axis=1)], axis=1)
+vc
+```
+This table yields some interesting insights. The QuAL score subscores are dependent on one another. Based on the structure of the subscores, it follows that if the evaluation is not detailed enough (Q1 $\leq$ 2), it's unlikely to contain a suggestion for improvement (Q1 = 0), and there can be no linking between behavior and improvement (Q3 = 0). The table backs this up, with the vast majority of Q2 and Q3 rated as zero if Q1 $\leq$ 2. If the evaluation is highly detailed (Q3 = 3), then naturally it is more likely to have a suggestion for improvement (Q2 = 1), and based on the table, it's also likely to link the suggestion to the behavior (Q3 = 1). Q3 is essentially redundant; Q3 is discrepant from Q3 in only 3.1% of all evaluations. 
+
+This means that the QuAL score can be reduced to three primary outcomes:
+
+* Q1 $\leq$ 2 - low detail, very unlikely (<10%) to contain suggestion for improvement 
+* Q1 = 3; Q2 and Q3 = 0 - high detail,  no suggestion for improvement
+* Q1 = 3; Q2 and Q3 = 1 - high detail, with suggestion for improvement, extremely likely to have connection between behavior/suggestion
+
+These three scenarios fit 2,349/2,500 = 94% of evaluations. This provides an opportunity to condense the QuAL score from 6 levels (0-5) to 3. Although the remainder of the results below do *not* condense the QuAL score, this could be a good way to boost accuracy results in a way that does not compromise the integrity of the score itself. 
+
+### Interrater Reliability
+This table shows the percent agreement for the QUAL score and each subscore
+```{python}
+pd.concat({
+    'Q1Match' : count_and_percent(df, 'Q1Match'),
+    'Q2Match' : count_and_percent(df, 'Q2Match'),
+    'Q3Match' : count_and_percent(df, 'Q3Match'),
+    'QUALMatch' : count_and_percent(df, 'perfectMatch')
+}, axis=1)
+```
+
+```{python}
+from sklearn.metrics import cohen_kappa_score
+pd.DataFrame(pd.Series([
+    cohen_kappa_score(df['q1p1'], df['q1p2']),
+    cohen_kappa_score(df['q2p1'], df['q2p2']),
+    cohen_kappa_score(df['q3p1'], df['q3p2']),
+    cohen_kappa_score(df['P1QualScore'], df['P2QualScore'])
+], index=['Q1','Q2','Q3','QuAL']), columns=['Cohen\'s Kappa'])
+```
+Cohen's Kappas were calculated and are presented above. There was fair agreement for all scores except for Q1, which had substantial agreement. This was before any tiebreaking/discrepancy correction. 
+
+### Other Demographics and Descriptive Statistics
+These may or may not be relevant. 
+
+```{python}
+pd.concat({
+    c : count_and_percent(df, c)
+    for c in ['GenderRes','GenderFac']
+}, axis=1)
+```
+
+ObserverType stratifies the evaluator by role.
+```{python}
+pd.concat({
+    c : count_and_percent(df, c)
+    for c in ['ObserverType']
+}, axis=1)
+```
+
+Only one of the two sites reports PGY levels for their trainees on their evaluations. 
+```{python}
+pd.DataFrame(df['PGY'].value_counts())
+```
+
+## Model Performance
+
+### Q1
+
+### Q2
+
+### Q3
+
+### QuAL

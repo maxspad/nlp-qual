@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>NLP-QuAL Results</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="results_lite_files/libs/clipboard/clipboard.min.js"></script>
+<script src="results_lite_files/libs/quarto-html/quarto.js"></script>
+<script src="results_lite_files/libs/quarto-html/popper.min.js"></script>
+<script src="results_lite_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="results_lite_files/libs/quarto-html/anchor.min.js"></script>
+<link href="results_lite_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="results_lite_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="results_lite_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="results_lite_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="results_lite_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#data-characteristicsdemographics" id="toc-data-characteristicsdemographics" class="nav-link active" data-scroll-target="#data-characteristicsdemographics">Data Characteristics/Demographics</a>
+  <ul class="collapse">
+  <li><a href="#score-distributions" id="toc-score-distributions" class="nav-link" data-scroll-target="#score-distributions">Score Distributions</a></li>
+  <li><a href="#interrater-reliability" id="toc-interrater-reliability" class="nav-link" data-scroll-target="#interrater-reliability">Interrater Reliability</a></li>
+  <li><a href="#other-demographics-and-descriptive-statistics" id="toc-other-demographics-and-descriptive-statistics" class="nav-link" data-scroll-target="#other-demographics-and-descriptive-statistics">Other Demographics and Descriptive Statistics</a></li>
+  </ul></li>
+  <li><a href="#model-performance" id="toc-model-performance" class="nav-link" data-scroll-target="#model-performance">Model Performance</a>
+  <ul class="collapse">
+  <li><a href="#q1" id="toc-q1" class="nav-link" data-scroll-target="#q1">Q1</a></li>
+  <li><a href="#q2" id="toc-q2" class="nav-link" data-scroll-target="#q2">Q2</a></li>
+  <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3">Q3</a></li>
+  <li><a href="#qual" id="toc-qual" class="nav-link" data-scroll-target="#qual">QuAL</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">NLP-QuAL Results</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="data-characteristicsdemographics" class="level2">
+<h2 class="anchored" data-anchor-id="data-characteristicsdemographics">Data Characteristics/Demographics</h2>
+<div class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<p>We analyzed 2500 evaluations, with 1250 from Site 1 (McMaster) and 1250 from Site 2 (Saskatchewan).</p>
+</div>
+</div>
+<p>For each evaluation, the QuAL score was rated by two separate raters. Each sub-score (Q1, Q2, and Q3) was rated and then summed to get the final QuAL score. Discrepancies were broken by members of the study team (who?)</p>
+<div class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<p>The average QuAL score was 2.6408, with standard deviation 1.275, median 3.0</p>
+</div>
+</div>
+<p>Descriptive statistics for the subscores and QuAL Score were:</p>
+<div class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="202">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Q1</th>
+      <th>Q2</th>
+      <th>Q3</th>
+      <th>QUAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>2500.000000</td>
+      <td>2500.000000</td>
+      <td>2500.000000</td>
+      <td>2500.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2.277200</td>
+      <td>0.193600</td>
+      <td>0.170000</td>
+      <td>2.640800</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>0.860149</td>
+      <td>0.395198</td>
+      <td>0.375708</td>
+      <td>1.275157</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>3.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>3.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<section id="score-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="score-distributions">Score Distributions</h3>
+<section id="subscores" class="level4">
+<h4 class="anchored" data-anchor-id="subscores">Subscores</h4>
+<p>The table below shows the count and associated percent for each level of each subscore.</p>
+<div class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="203">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">Q1</th>
+      <th colspan="2" halign="left">Q2</th>
+      <th colspan="2" halign="left">Q3</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>105</td>
+      <td>4.20</td>
+      <td>2016.0</td>
+      <td>80.64</td>
+      <td>2075.0</td>
+      <td>83.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>359</td>
+      <td>14.36</td>
+      <td>484.0</td>
+      <td>19.36</td>
+      <td>425.0</td>
+      <td>17.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>774</td>
+      <td>30.96</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1262</td>
+      <td>50.48</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The distribution for the subscores is plotted below</p>
+<div class="cell quarto-layout-panel" data-execution_count="6">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="results_lite_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img" width="593"></p>
+<p></p><figcaption class="figure-caption">Q1</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="results_lite_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img" width="602"></p>
+<p></p><figcaption class="figure-caption">Q2</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="results_lite_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img" width="602"></p>
+<p></p><figcaption class="figure-caption">Q3</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p>Distribution of QuAL Subscores</p>
+</div>
+</div>
+</div>
+<p>Evaluations tended to score highly (&gt; 2) on Q1, but poorly (80% 0 and 83% 0, respectively) on Q2 and Q3. There were large differences in scores between the two sites.</p>
+</section>
+<section id="qual-score" class="level4">
+<h4 class="anchored" data-anchor-id="qual-score">QuAL Score</h4>
+<p>The table below shows the raw counts and percentages associated with each level of the rated QuAL score.</p>
+<div class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="205">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100</td>
+      <td>4.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>338</td>
+      <td>13.52</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>685</td>
+      <td>27.40</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>957</td>
+      <td>38.28</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>77</td>
+      <td>3.08</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>343</td>
+      <td>13.72</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The distribution of the QuAL score is plotted below:</p>
+<div class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<p><img src="results_lite_files/figure-html/cell-9-output-1.png" width="593" height="422"></p>
+</div>
+</div>
+<p>This table shows the counts/frequencies for each possible combination of subscores. For each possible final QuAL score, the table shows the combination fo subscores most likely to generate that QuAL score.</p>
+<div class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="207">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+    <tr>
+      <th>QUAL</th>
+      <th>Q1</th>
+      <th>Q2</th>
+      <th>Q3</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <th>0</th>
+      <th>0</th>
+      <th>0</th>
+      <td>100</td>
+      <td>4.00</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">1</th>
+      <th>0</th>
+      <th>1</th>
+      <th>0</th>
+      <td>5</td>
+      <td>0.20</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>0</th>
+      <th>0</th>
+      <td>333</td>
+      <td>13.32</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">2</th>
+      <th rowspan="2" valign="top">1</th>
+      <th>0</th>
+      <th>1</th>
+      <td>1</td>
+      <td>0.04</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>0</th>
+      <td>21</td>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <th>0</th>
+      <th>0</th>
+      <td>663</td>
+      <td>26.52</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">3</th>
+      <th>1</th>
+      <th>1</th>
+      <th>1</th>
+      <td>4</td>
+      <td>0.16</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2</th>
+      <th>0</th>
+      <th>1</th>
+      <td>2</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>0</th>
+      <td>41</td>
+      <td>1.64</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <th>0</th>
+      <th>0</th>
+      <td>910</td>
+      <td>36.40</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">4</th>
+      <th>2</th>
+      <th>1</th>
+      <th>1</th>
+      <td>68</td>
+      <td>2.72</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">3</th>
+      <th>0</th>
+      <th>1</th>
+      <td>7</td>
+      <td>0.28</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>0</th>
+      <td>2</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <th>3</th>
+      <th>1</th>
+      <th>1</th>
+      <td>343</td>
+      <td>13.72</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>This table yields some interesting insights. The QuAL score subscores are dependent on one another. Based on the structure of the subscores, it follows that if the evaluation is not detailed enough (Q1 <span class="math inline">\(\leq\)</span> 2), it’s unlikely to contain a suggestion for improvement (Q1 = 0), and there can be no linking between behavior and improvement (Q3 = 0). The table backs this up, with the vast majority of Q2 and Q3 rated as zero if Q1 <span class="math inline">\(\leq\)</span> 2. If the evaluation is highly detailed (Q3 = 3), then naturally it is more likely to have a suggestion for improvement (Q2 = 1), and based on the table, it’s also likely to link the suggestion to the behavior (Q3 = 1). Q3 is essentially redundant; Q3 is discrepant from Q3 in only 3.1% of all evaluations.</p>
+<p>This means that the QuAL score can be reduced to three primary outcomes:</p>
+<ul>
+<li>Q1 <span class="math inline">\(\leq\)</span> 2 - low detail, very unlikely (&lt;10%) to contain suggestion for improvement</li>
+<li>Q1 = 3; Q2 and Q3 = 0 - high detail, no suggestion for improvement</li>
+<li>Q1 = 3; Q2 and Q3 = 1 - high detail, with suggestion for improvement, extremely likely to have connection between behavior/suggestion</li>
+</ul>
+<p>These three scenarios fit 2,349/2,500 = 94% of evaluations. This provides an opportunity to condense the QuAL score from 6 levels (0-5) to 3. Although the remainder of the results below do <em>not</em> condense the QuAL score, this could be a good way to boost accuracy results in a way that does not compromise the integrity of the score itself.</p>
+</section>
+</section>
+<section id="interrater-reliability" class="level3">
+<h3 class="anchored" data-anchor-id="interrater-reliability">Interrater Reliability</h3>
+<p>This table shows the percent agreement for the QUAL score and each subscore</p>
+<div class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="208">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">Q1Match</th>
+      <th colspan="2" halign="left">Q2Match</th>
+      <th colspan="2" halign="left">Q3Match</th>
+      <th colspan="2" halign="left">QUALMatch</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>1059</td>
+      <td>42.36</td>
+      <td>188</td>
+      <td>7.52</td>
+      <td>606</td>
+      <td>24.24</td>
+      <td>1426</td>
+      <td>57.04</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>1441</td>
+      <td>57.64</td>
+      <td>2312</td>
+      <td>92.48</td>
+      <td>1894</td>
+      <td>75.76</td>
+      <td>1074</td>
+      <td>42.96</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="209">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Cohen's Kappa</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Q1</th>
+      <td>0.387601</td>
+    </tr>
+    <tr>
+      <th>Q2</th>
+      <td>0.751249</td>
+    </tr>
+    <tr>
+      <th>Q3</th>
+      <td>0.351520</td>
+    </tr>
+    <tr>
+      <th>QuAL</th>
+      <td>0.317628</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Cohen’s Kappas were calculated and are presented above. There was fair agreement for all scores except for Q1, which had substantial agreement. This was before any tiebreaking/discrepancy correction.</p>
+</section>
+<section id="other-demographics-and-descriptive-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="other-demographics-and-descriptive-statistics">Other Demographics and Descriptive Statistics</h3>
+<p>These may or may not be relevant.</p>
+<div class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="210">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">GenderRes</th>
+      <th colspan="2" halign="left">GenderFac</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Female</th>
+      <td>1037.0</td>
+      <td>41.48</td>
+      <td>877</td>
+      <td>35.08</td>
+    </tr>
+    <tr>
+      <th>Male</th>
+      <td>1463.0</td>
+      <td>58.52</td>
+      <td>1447</td>
+      <td>57.88</td>
+    </tr>
+    <tr>
+      <th>Unknown</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>176</td>
+      <td>7.04</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>ObserverType stratifies the evaluator by role.</p>
+<div class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="211">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">ObserverType</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Count</th>
+      <th>Percent of Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>clinical supervisor</th>
+      <td>1200</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>faculty</th>
+      <td>1165</td>
+      <td>46.6</td>
+    </tr>
+    <tr>
+      <th>resident</th>
+      <td>135</td>
+      <td>5.4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Only one of the two sites reports PGY levels for their trainees on their evaluations.</p>
+<div class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="212">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>PGY</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Unknown</th>
+      <td>1251</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>510</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>456</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>157</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>117</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="model-performance" class="level2">
+<h2 class="anchored" data-anchor-id="model-performance">Model Performance</h2>
+<section id="q1" class="level3">
+<h3 class="anchored" data-anchor-id="q1">Q1</h3>
+</section>
+<section id="q2" class="level3">
+<h3 class="anchored" data-anchor-id="q2">Q2</h3>
+</section>
+<section id="q3" class="level3">
+<h3 class="anchored" data-anchor-id="q3">Q3</h3>
+</section>
+<section id="qual" class="level3">
+<h3 class="anchored" data-anchor-id="qual">QuAL</h3>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
