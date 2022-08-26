@@ -44,7 +44,8 @@ ul.task-list{list-style: none;}
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-characteristicsdemographics" id="toc-data-characteristicsdemographics" class="nav-link active" data-scroll-target="#data-characteristicsdemographics">Data Characteristics/Demographics</a>
+  <li><a href="#qual-score" id="toc-qual-score" class="nav-link active" data-scroll-target="#qual-score">QuAL Score</a></li>
+  <li><a href="#data-descriptives-and-demographics" id="toc-data-descriptives-and-demographics" class="nav-link" data-scroll-target="#data-descriptives-and-demographics">Data Descriptives and Demographics</a>
   <ul class="collapse">
   <li><a href="#score-distributions" id="toc-score-distributions" class="nav-link" data-scroll-target="#score-distributions">Score Distributions</a></li>
   <li><a href="#interrater-reliability" id="toc-interrater-reliability" class="nav-link" data-scroll-target="#interrater-reliability">Interrater Reliability</a></li>
@@ -52,10 +53,8 @@ ul.task-list{list-style: none;}
   </ul></li>
   <li><a href="#model-performance" id="toc-model-performance" class="nav-link" data-scroll-target="#model-performance">Model Performance</a>
   <ul class="collapse">
+  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics">Metrics</a></li>
   <li><a href="#q1" id="toc-q1" class="nav-link" data-scroll-target="#q1">Q1</a></li>
-  <li><a href="#q2" id="toc-q2" class="nav-link" data-scroll-target="#q2">Q2</a></li>
-  <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3">Q3</a></li>
-  <li><a href="#qual" id="toc-qual" class="nav-link" data-scroll-target="#qual">QuAL</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -78,8 +77,17 @@ ul.task-list{list-style: none;}
 
 </header>
 
-<section id="data-characteristicsdemographics" class="level2">
-<h2 class="anchored" data-anchor-id="data-characteristicsdemographics">Data Characteristics/Demographics</h2>
+<section id="qual-score" class="level2">
+<h2 class="anchored" data-anchor-id="qual-score">QuAL Score</h2>
+<p>As a review, the QuAL score aims to assess the quality of written feedback for medical trainees. It has been validated in a GME context. It ranges from 0 (lowest quality) to 6 (highest quality). It is the sum of three subscores:</p>
+<ul>
+<li>Q1 - Does the rater provide sufficient evidence about resident performance? (Rated on a three-point scale: 0-no comment at all, 1-no, but comment present, 2-somewhat, 3-yes/full description)</li>
+<li>Q2 - Suggestion - Does the rater provide a suggestion for improvement? (0-no/1-yes)</li>
+<li>Q3 - Connection - Is the rater’s suggestion linked to the behavior described? (0-no/1-yes)</li>
+</ul>
+</section>
+<section id="data-descriptives-and-demographics" class="level2">
+<h2 class="anchored" data-anchor-id="data-descriptives-and-demographics">Data Descriptives and Demographics</h2>
 <div class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <p>We analyzed 2500 evaluations, with 1250 from Site 1 (McMaster) and 1250 from Site 2 (Saskatchewan).</p>
@@ -93,7 +101,7 @@ ul.task-list{list-style: none;}
 </div>
 <p>Descriptive statistics for the subscores and QuAL Score were:</p>
 <div class="cell" data-execution_count="4">
-<div class="cell-output cell-output-display" data-execution_count="64">
+<div class="cell-output cell-output-display" data-execution_count="4">
 
 <div>
 
@@ -145,9 +153,8 @@ ul.task-list{list-style: none;}
 <h3 class="anchored" data-anchor-id="score-distributions">Score Distributions</h3>
 <section id="subscores" class="level4">
 <h4 class="anchored" data-anchor-id="subscores">Subscores</h4>
-<p>The table below shows the count and associated percent for each level of each subscore.</p>
 <div class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display" data-execution_count="65">
+<div class="cell-output cell-output-display" data-execution_count="5">
 
 <div>
 
@@ -211,29 +218,29 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 </div>
-<p>The distribution for the subscores is plotted below</p>
+<p>The distribution for the subscores is plotted below:</p>
 <div class="cell quarto-layout-panel" data-execution_count="6">
 <div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.0%;justify-content: center;">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="results_lite_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img" width="593"></p>
+<p><img src="results_lite_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 <p></p><figcaption class="figure-caption">Q1</figcaption><p></p>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.5%;justify-content: center;">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="results_lite_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img" width="602"></p>
+<p><img src="results_lite_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
 <p></p><figcaption class="figure-caption">Q2</figcaption><p></p>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.5%;justify-content: center;">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="results_lite_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img" width="602"></p>
+<p><img src="results_lite_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img"></p>
 <p></p><figcaption class="figure-caption">Q3</figcaption><p></p>
 </figure>
 </div>
@@ -247,11 +254,11 @@ ul.task-list{list-style: none;}
 </div>
 <p>Evaluations tended to score highly (&gt; 2) on Q1, but poorly (80% 0 and 83% 0, respectively) on Q2 and Q3. There were large differences in scores between the two sites.</p>
 </section>
-<section id="qual-score" class="level4">
-<h4 class="anchored" data-anchor-id="qual-score">QuAL Score</h4>
+<section id="qual-score-1" class="level4">
+<h4 class="anchored" data-anchor-id="qual-score-1">QuAL Score</h4>
 <p>The table below shows the raw counts and percentages associated with each level of the rated QuAL score.</p>
 <div class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display" data-execution_count="67">
+<div class="cell-output cell-output-display" data-execution_count="7">
 
 <div>
 
@@ -302,12 +309,12 @@ ul.task-list{list-style: none;}
 <p>The distribution of the QuAL score is plotted below:</p>
 <div class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
-<p><img src="results_lite_files/figure-html/cell-9-output-1.png" width="593" height="422"></p>
+<p><img src="results_lite_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 <p>This table shows the counts/frequencies for each possible combination of subscores. For each possible final QuAL score, the table shows the combination fo subscores most likely to generate that QuAL score.</p>
 <div class="cell" data-execution_count="9">
-<div class="cell-output cell-output-display" data-execution_count="69">
+<div class="cell-output cell-output-display" data-execution_count="9">
 
 <div>
 
@@ -451,7 +458,7 @@ ul.task-list{list-style: none;}
 <h3 class="anchored" data-anchor-id="interrater-reliability">Interrater Reliability</h3>
 <p>This table shows the percent agreement for the QUAL score and each subscore</p>
 <div class="cell" data-execution_count="10">
-<div class="cell-output cell-output-display" data-execution_count="70">
+<div class="cell-output cell-output-display" data-execution_count="10">
 
 <div>
 
@@ -505,7 +512,7 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 <div class="cell" data-execution_count="11">
-<div class="cell-output cell-output-display" data-execution_count="71">
+<div class="cell-output cell-output-display" data-execution_count="11">
 
 <div>
 
@@ -544,7 +551,7 @@ ul.task-list{list-style: none;}
 <h3 class="anchored" data-anchor-id="other-demographics-and-descriptive-statistics">Other Demographics and Descriptive Statistics</h3>
 <p>These may or may not be relevant.</p>
 <div class="cell" data-execution_count="12">
-<div class="cell-output cell-output-display" data-execution_count="72">
+<div class="cell-output cell-output-display" data-execution_count="12">
 
 <div>
 
@@ -592,7 +599,7 @@ ul.task-list{list-style: none;}
 </div>
 <p>ObserverType stratifies the evaluator by role.</p>
 <div class="cell" data-execution_count="13">
-<div class="cell-output cell-output-display" data-execution_count="73">
+<div class="cell-output cell-output-display" data-execution_count="13">
 
 <div>
 
@@ -631,7 +638,7 @@ ul.task-list{list-style: none;}
 </div>
 <p>Only one of the two sites reports PGY levels for their trainees on their evaluations.</p>
 <div class="cell" data-execution_count="14">
-<div class="cell-output cell-output-display" data-execution_count="74">
+<div class="cell-output cell-output-display" data-execution_count="14">
 
 <div>
 
@@ -676,39 +683,81 @@ ul.task-list{list-style: none;}
 </section>
 <section id="model-performance" class="level2">
 <h2 class="anchored" data-anchor-id="model-performance">Model Performance</h2>
+<section id="metrics" class="level3">
+<h3 class="anchored" data-anchor-id="metrics">Metrics</h3>
+<p>Models were assessed using the following performance metrics: * Balanced Accuracy: The weighted average of accuracies for each possible class (rating). In situations where the data is imbalanced, including this one, accuracy can be falsely inflated if the model over-biases against the rare classes. Balanced accuracy compensates for this and provides a more valid assessment of model performance in the real world. It is the most important metric evaluated. * Accuracy: The percentage of time the model made the correct guess about the rating * Top 2 Accuracy: The percentage of time the model’s first guess <strong>or</strong> second guess was correct. Only applies to targets with <span class="math inline">\(\geq\)</span> 2 levels (Q1 and overall QuAL) * Top 3 Accuracy: Same as above but includes first, second, or third guess. * Mean absolute error (MAE): Average discrepancy between the model’s guess and the true rating. Useful for Q1 and QuAL. * ROC AUC Score: Area under the receiver operating curve. Common metric reported in ML literature. Subject to inflation if classes are imbalanced. Only well-defined for two-class targets (Q2 and Q3). * Precision: Positive predictive value, the chance that a “positive” prediction (usually defined as the outcome of interest, in this case <strong>lower</strong> quality) is actually correct. Best defined for two-class targets, but averages can be taken for multi-class targets (Q1 and QuAL). * Recall: Sensitivity * F1: The geometric mean of precision and recall, often reported in the ML literature.</p>
+</section>
 <section id="q1" class="level3">
 <h3 class="anchored" data-anchor-id="q1">Q1</h3>
-<div class="cell" data-execution_count="15">
+<p>Q1 assessed the level of evidence about the learner’s performance provided in the evaluation. Specifically, Q1 asked, “Does the rater provide sufficient evidence about resident performance?” It was rated on a three-point scale: 0-no comment at all, 1-no, but comment present, 2-somewhat, 3-yes/full description.</p>
+<div class="cell" data-execution_count="16">
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;Run: data=&lt;RunData: metrics={'accuracy': 0.8346666666666667,
- 'balanced_accuracy': 0.7752202330207445,
- 'f1': 0.8956228956228957,
- 'fn': 40.0,
- 'fp': 22.0,
- 'precision': 0.9236111111111112,
- 'recall': 0.869281045751634,
- 'roc_auc': 0.8667235009946008,
- 'tn': 266.0,
- 'tp': 47.0}, params={'mlflow_dir': 'mlruns',
- 'mlflow_run_id': '8a2417c0ca784c12a4cccd8abca64a58',
- 'mlflow_source_experiment_name': 'hparam_simplification',
- 'mlflow_target_experiment_name': 'test',
- 'target_var': 'Q2',
- 'test_path': 'data/processed/test.pkl'}, tags={'mlflow.source.git.commit': 'd2b2329f74243e71d715ce50a43c95c95886b79a',
+<pre><code>&lt;Run: data=&lt;RunData: metrics={'accuracy': 0.624,
+ 'balanced_accuracy': 0.590736025345932,
+ 'cm_0_0': 16.0,
+ 'cm_0_1': 6.0,
+ 'cm_0_2': 3.0,
+ 'cm_0_3': 0.0,
+ 'cm_1_0': 3.0,
+ 'cm_1_1': 24.0,
+ 'cm_1_2': 19.0,
+ 'cm_1_3': 3.0,
+ 'cm_2_0': 0.0,
+ 'cm_2_1': 26.0,
+ 'cm_2_2': 57.0,
+ 'cm_2_3': 30.0,
+ 'cm_3_0': 0.0,
+ 'cm_3_1': 15.0,
+ 'cm_3_2': 36.0,
+ 'cm_3_3': 137.0,
+ 'f1': 0.5981589639410869,
+ 'f1_0': 0.7272727272727272,
+ 'f1_1': 0.4,
+ 'f1_2': 0.5000000000000001,
+ 'f1_3': 0.76536312849162,
+ 'prec_0': 0.8421052631578947,
+ 'prec_1': 0.3380281690140845,
+ 'prec_2': 0.4956521739130435,
+ 'prec_3': 0.8058823529411765,
+ 'precision': 0.6204169897565498,
+ 'rec_0': 0.64,
+ 'rec_1': 0.4897959183673469,
+ 'rec_2': 0.504424778761062,
+ 'rec_3': 0.7287234042553191,
+ 'recall': 0.590736025345932,
+ 'roc_auc': nan,
+ 'supp_0': 25.0,
+ 'supp_1': 49.0,
+ 'supp_2': 113.0,
+ 'supp_3': 188.0,
+ 'top_2_acc': 0.88,
+ 'top_3_acc': 0.9733333333333334}, params={'conda_yaml_path': './conda.yaml',
+ 'invert_target': 'True',
+ 'mlflow_dir': 'mlruns',
+ 'mlflow_run_id': '059651b7006d4e0099fdf410fad12532',
+ 'mlflow_source_experiment_name': '220812_123209_q1_10000t_random',
+ 'mlflow_target_experiment_name': 'Q1_test',
+ 'n_top': '15',
+ 'posthoc': 'True',
+ 'target_var': 'Q1',
+ 'test_path': 'data/processed/test.pkl'}, tags={'mlflow.log-model.history': '[{"run_id": "abfc70ff15504cf5993250071cfb566e", '
+                             '"artifact_path": "model", "utc_time_created": '
+                             '"2022-08-16 17:02:17.540058", "flavors": '
+                             '{"python_function": {"model_path": "model.pkl", '
+                             '"loader_module": "mlflow.sklearn", '
+                             '"python_version": "3.9.13", "env": '
+                             '"conda.yaml"}, "sklearn": {"pickled_model": '
+                             '"model.pkl", "sklearn_version": "1.1.1", '
+                             '"serialization_format": "cloudpickle", "code": '
+                             'null}}, "model_uuid": '
+                             '"92eb2a3c799d46e0a5595ef03a407e7c", '
+                             '"mlflow_version": "1.26.1"}]',
+ 'mlflow.source.git.commit': '33e6fd26a6703566f9b4f891d5cc6aac6c9cbdcb',
  'mlflow.source.name': '/home/maxspad/proj/nlp-qual-max/src/models/test.py',
  'mlflow.source.type': 'LOCAL',
- 'mlflow.user': 'maxspad'}&gt;, info=&lt;RunInfo: artifact_uri='file:///home/maxspad/proj/nlp-qual-max/mlruns/9/9feba93902bc44e0a08388f49fad81cf/artifacts', end_time=1659705825254, experiment_id='9', lifecycle_stage='active', run_id='9feba93902bc44e0a08388f49fad81cf', run_uuid='9feba93902bc44e0a08388f49fad81cf', start_time=1659705824895, status='FINISHED', user_id='maxspad'&gt;&gt;</code></pre>
+ 'mlflow.user': 'maxspad'}&gt;, info=&lt;RunInfo: artifact_uri='file:///home/maxspad/proj/nlp-qual-max/mlruns/28/abfc70ff15504cf5993250071cfb566e/artifacts', end_time=1660669341020, experiment_id='28', lifecycle_stage='active', run_id='abfc70ff15504cf5993250071cfb566e', run_uuid='abfc70ff15504cf5993250071cfb566e', start_time=1660669336938, status='FINISHED', user_id='maxspad'&gt;&gt;</code></pre>
 </div>
 </div>
-</section>
-<section id="q2" class="level3">
-<h3 class="anchored" data-anchor-id="q2">Q2</h3>
-</section>
-<section id="q3" class="level3">
-<h3 class="anchored" data-anchor-id="q3">Q3</h3>
-</section>
-<section id="qual" class="level3">
-<h3 class="anchored" data-anchor-id="qual">QuAL</h3>
 </section>
 </section>
 

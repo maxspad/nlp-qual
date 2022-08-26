@@ -13,6 +13,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from IPython.display import display, Markdown
+import mlflow
+import os
+os.chdir('../../')
+print(os.getcwd())
 
 def md(s : str):
     display(Markdown(s))
@@ -23,9 +27,9 @@ def count_and_percent(df: pd.DataFrame, col : str):
     return pd.concat([qc, qcn], axis=1)
 
 ### Load Data
-df = pd.read_pickle('../../data/interim/masterdbForNLPSpacyProc.pkl')
-train = pd.read_pickle('../../data/processed/train.pkl')
-test = pd.read_pickle('../../data/processed/test.pkl')
+df = pd.read_pickle('data/interim/masterdbForNLPSpacyProc.pkl')
+train = pd.read_pickle('data/processed/train.pkl')
+test = pd.read_pickle('data/processed/test.pkl')
 ```
 ## Data Characteristics/Demographics
 ```{python}
@@ -154,7 +158,11 @@ pd.DataFrame(df['PGY'].value_counts())
 ## Model Performance
 
 ### Q1
-
+```{python}
+RUN_ID = '9feba93902bc44e0a08388f49fad81cf'
+run = mlflow.get_run(RUN_ID)
+print(run)
+```
 ### Q2
 
 ### Q3
