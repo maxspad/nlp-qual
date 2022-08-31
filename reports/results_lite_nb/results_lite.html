@@ -59,6 +59,11 @@ ul.task-list{list-style: none;}
   <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3">Q3</a></li>
   <li><a href="#qual" id="toc-qual" class="nav-link" data-scroll-target="#qual">QuAL</a></li>
   </ul></li>
+  <li><a href="#discussion-and-next-steps" id="toc-discussion-and-next-steps" class="nav-link" data-scroll-target="#discussion-and-next-steps">Discussion and Next Steps</a>
+  <ul class="collapse">
+  <li><a href="#interpretation-of-accuracy" id="toc-interpretation-of-accuracy" class="nav-link" data-scroll-target="#interpretation-of-accuracy">Interpretation of Accuracy</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -103,8 +108,8 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 <p>Descriptive statistics for the subscores and QuAL Score were:</p>
-<div class="cell" data-execution_count="34">
-<div class="cell-output cell-output-display" data-execution_count="34">
+<div class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div id="tbl-descrips" class="anchored">
 
 <div>
@@ -325,8 +330,8 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 <p>This table shows the counts/frequencies for each possible combination of subscores. For each possible final QuAL score, the table shows the combination fo subscores most likely to generate that QuAL score.</p>
-<div class="cell" data-execution_count="25">
-<div class="cell-output cell-output-display" data-execution_count="25">
+<div class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div id="tbl-qualcounts" class="anchored">
 
 <div>
@@ -458,7 +463,7 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 </div>
-<p>This table yields some interesting insights. The QuAL score subscores are dependent on one another. Based on the structure of the subscores, it follows that if the evaluation is not detailed enough (Q1 <span class="math inline">\(\leq\)</span> 2), it’s unlikely to contain a suggestion for improvement (Q1 = 0), and there can be no linking between behavior and improvement (Q3 = 0). The table backs this up, with the vast majority of Q2 and Q3 rated as zero if Q1 <span class="math inline">\(\leq\)</span> 2. If the evaluation is highly detailed (Q3 = 3), then naturally it is more likely to have a suggestion for improvement (Q2 = 1), and based on the table, it’s also likely to link the suggestion to the behavior (Q3 = 1). Q3 is essentially redundant; Q3 is discrepant from Q3 in only 3.1% of all evaluations.</p>
+<p>This table yields some interesting insights. The QuAL score subscores are dependent on one another. Based on the structure of the subscores, it follows that if the evaluation is not detailed enough (Q1 <span class="math inline">\(\leq\)</span> 2), it’s unlikely to contain a suggestion for improvement (Q1 = 0), and there can be no linking between behavior and improvement (Q3 = 0). The table backs this up, with the vast majority of Q2 and Q3 rated as zero if Q1 <span class="math inline">\(\leq\)</span> 2. If the evaluation is highly detailed (Q3 = 3), then naturally it is more likely to have a suggestion for improvement (Q2 = 1), and based on the table, it’s also likely to link the suggestion to the behavior (Q3 = 1). Q3 is essentially redundant; Q3 is discrepant from Q2 in only 3.1% of all evaluations.</p>
 <p>This means that the QuAL score can be reduced to three primary outcomes:</p>
 <ul>
 <li>Q1 <span class="math inline">\(\leq\)</span> 2 - low detail, very unlikely (&lt;10%) to contain suggestion for improvement</li>
@@ -563,7 +568,7 @@ ul.task-list{list-style: none;}
 </div>
 </div>
 </div>
-<p>Cohen’s Kappas were calculated and are presented above. There was fair agreement for all scores except for Q1, which had substantial agreement. This was before any tiebreaking/discrepancy correction.</p>
+<p>Cohen’s Kappas were calculated and are presented above. There was fair agreement for all scores except for Q2, which had substantial agreement. This was before any tiebreaking/discrepancy correction.</p>
 </section>
 <section id="other-demographics-and-descriptive-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="other-demographics-and-descriptive-statistics">Other Demographics and Descriptive Statistics</h3>
@@ -713,7 +718,7 @@ ul.task-list{list-style: none;}
 <ul>
 <li><em>Balanced Accuracy</em> - The weighted average of accuracies for each possible class (rating). In situations where the data is imbalanced, including this one, accuracy can be falsely inflated if the model over-biases against the rare classes. Balanced accuracy compensates for this and provides a more valid assessment of model performance in the real world. It is the most important metric evaluated.</li>
 <li><em>Accuracy</em> - The percentage of time the model made the correct guess about the rating</li>
-<li><em>Top 2 Accuracy</em> - The percentage of time the model’s first guess <strong>or</strong> second guess was correct. Only applies to targets with <span class="math inline">\(\geq\)</span> 2 levels (Q1 and overall QuAL)</li>
+<li><em>Top 2 Accuracy</em> - The percentage of time the model’s first guess <strong>or</strong> second guess was correct. Only applies to targets with <span class="math inline">\(\geq\)</span> 3 levels (Q1 and overall QuAL)</li>
 <li><em>Top 3 Accuracy</em> - Same as above but includes first, second, or third guess.</li>
 <li><em>Mean absolute error (MAE)</em> - Average discrepancy between the model’s guess and the true rating. Useful for Q1 and QuAL.</li>
 <li><em>ROC AUC Score</em> - Area under the receiver operating curve. Common metric reported in ML literature. Subject to inflation if classes are imbalanced. Only well-defined for two-class targets (Q2 and Q3).</li>
@@ -997,8 +1002,8 @@ Note
 <section id="qual" class="level3">
 <h3 class="anchored" data-anchor-id="qual">QuAL</h3>
 <p>The table below shows the model performance metrics for the overall QuAL score.</p>
-<div class="cell" data-execution_count="31">
-<div class="cell-output cell-output-display" data-execution_count="31">
+<div class="cell" data-execution_count="26">
+<div class="cell-output cell-output-display" data-execution_count="26">
 <div id="tbl-qualmetrics" class="anchored">
 
 <div>
@@ -1049,10 +1054,10 @@ Note
 </div>
 </div>
 </div>
-<p>Overall, ***</p>
+<p>The model performs fair overall. A random guess gives an accuracy of 0.167, our accuracy is 0.438. Top-2 accuracy is significantly improved, at 0.749. Mean absolute error is only 0.772, meaning the model is right (off by less than 1) more than it is wrong (off by 1 or more).</p>
 <p>Exploring performance by class level and visualizing the confusion matrix, we can begin to see the reasons for high/low performance:</p>
-<div class="cell" data-execution_count="33">
-<div class="cell-output cell-output-display" data-execution_count="33">
+<div class="cell" data-execution_count="27">
+<div class="cell-output cell-output-display" data-execution_count="27">
 <div id="tbl-qualbyrating" class="anchored">
 
 <div>
@@ -1107,7 +1112,7 @@ Note
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="35">
+<div class="cell" data-execution_count="28">
 <div class="cell-output cell-output-display">
 <div id="fig-qualconf" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1117,6 +1122,19 @@ Note
 </div>
 </div>
 </div>
+<p>Once again, the model performs best at the extremes. It technically performs worst for QuAL = 4, but there are so few actual examples rated 4 that it is essentially uninterpretable. It otherwise struggles most in the QuAL = 1 and QuAL = 2 categories. This makes sense, as the Q1 model above struggles most for Q1 = 1 and Q1 = 2, and based on <a href="#tbl-qualcounts">Table&nbsp;4</a>, Q2/Q3 don’t play much of a role until Q1 = 3. The most interesting finding here is that the model naturally assumes the structure described in <a href="#tbl-qualcounts">Table&nbsp;4</a>. That is, three “true” ratings: Q1 <span class="math inline">\(\leq\)</span> 2 and Q2/3 = 0 (QuAL = 0-2); Q1 = 3 and Q2/3 = 0 (QuAL = 3); and Q1 = 3 and Q2/3 = 1 (QuAL = 5).</p>
+</section>
+</section>
+<section id="discussion-and-next-steps" class="level1">
+<h1>Discussion and Next Steps</h1>
+<section id="interpretation-of-accuracy" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-of-accuracy">Interpretation of Accuracy</h2>
+<p>It is difficult to interpret the overall performance of the model. As a number, 46% accurracy does not sound particularly impressive, though when you consider it is a 6-point scale, there is some leeway, particularly given the high top-2 accuracy and relatively low mean absolute error. Interpreting the accuracy is also difficult without anything to compare it to. The closesest is the <a href="https://pubmed.ncbi.nlm.nih.gov/33951682/">Otles et al paper</a> (Brian George group), which demonstrated an accuracy of 0.64 on a 4-level scale. Having subscores works to our advantage, as our performance on Q2 and Q3 is stellar, and it allows us to say that we are predicting something new and interesting compared to prior approaches.</p>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
+<p>Overall, this analysis makes the strongest case for condensing the QuAL score. At the very least, QuAL = 4 should be removed. Based on the analyses above, the QuAL score seems more like a thresholded 3-level score, rather than a 6 level score. Q1 can be condensed to two levels (Q1 <span class="math inline">\(\leq\)</span> 2 and Q1 = 3), and Q3 should be eliminated as it is redundant with Q2. This will significantly increase our accuracy, at the expense of some increased complexity in justifying why we condensed the score. It will also better model the real-world behavior of the score.</p>
+<p>The modeling above should be re-run with the condensed score. Deep learning approaches should also be tried, especially for Q1.</p>
 </section>
 </section>
 
