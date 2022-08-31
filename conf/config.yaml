@@ -3,6 +3,14 @@ make_dataset:
   mac_path: data/raw/mcmaster-database-de-identified-comments.xlsx
   sas_path: data/raw/sask-database-de-identified-comments.xlsx
   output_path: data/interim/masterdbForNLP.xlsx
+  q1_condense: True
+  q1_condense_col_name: Q1c
+  q2_invert: True
+  q2_invert_col_name: Q2i
+  q3_invert: True
+  q3_invert_col_name: Q3i
+  qual_condense: True
+  qual_condense_col_name: QUALc
 
 proc_spacy:
   dataset_path: ${make_dataset.output_path}
@@ -29,7 +37,7 @@ train:
   mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
-  target_var: QUAL
+  target_var: Q1c
   invert_target: True
   random_seed: 43
   punct: True
@@ -48,6 +56,7 @@ train:
   max_iter: 10000
   class_weight: 'balanced'
 
+  # only applies if training QUAL
   q1_mlflow_exp_name: 220812_123209_q1_10000t_random
   q1_mlflow_run_id: 059651b7006d4e0099fdf410fad12532
   q2_mlflow_exp_name: hparam_simplification

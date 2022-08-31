@@ -91,6 +91,31 @@ def main(cfg : DictConfig):
     log.info('Merging in demographic columns from raw data...')
     masterdb = _add_demog_cols(masterdb, cfg.mac_path, cfg.sas_path)
 
+    # create modified targets
+    log.info('Modifying targets...')
+    if cfg.q1_condense:
+        masterdb[cfg.q1_condense_col_name] = masterdb['Q1'].replace({
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 1
+        })
+    if cfg.q2_invert:
+        masterdb[cfg.q2_invert_col_name] = masterdb['Q2'] * -1 + 1
+    if cfg.q3_invert:
+        masterdb[cfg.q3_invert_col_name] = masterdb['Q3'] * -1 + 1
+    if cfg.qual_condense:
+        # if q1 <= 2, 0
+        # if q1 >= 2, q2 = 0, 1
+        # if q1 >= 2, q2 = 1, 2
+        masterdb[cfg.qual_condense_col_name] = (masterdb['Q1'] >= 3) # 0 if <= 2, 1 otherwise
+        q1_gt2 = masterdb[cfg.qual_condense_col_name]
+        masterdb.loc[q1_gt2, cfg.qual_condense_col_name] = (
+            masterdb.loc[q1_gt2, cfg.qual_condense_col_name] +
+            masterdb.loc[q1_gt2, 'Q2']
+        )
+        masterdb[cfg.qual_condense_col_name] = masterdb[cfg.qual_condense_col_name].astype('int')
+
     # output the result
     log.info(f'Saving to {cfg.output_path}')
     masterdb.to_excel(cfg.output_path)

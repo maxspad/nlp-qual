@@ -63,14 +63,12 @@ def main(cfg : DictConfig):
         log.info(f'Y value counts\n{y_value_counts}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
-
-        pipe_steps_QUAL = get_pipe_steps_for_QUAL(cfg)
         pipe_steps_subvars = get_pipe_steps_for_subvars(cfg)
-        
-
+    
         # Add the model to the pipeline at the end
         mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
         if cfg.target_var == 'QUAL':
+            pipe_steps_QUAL = get_pipe_steps_for_QUAL(cfg)
             log.info(f'Target {cfg.target_var}, subtype {cfg.qual_fit_type}')
             if cfg.qual_fit_type == 'simultaneous':
                 pipe = Pipeline((
