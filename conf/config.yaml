@@ -66,6 +66,21 @@ train:
   qual_text_mlflow_exp_name: QUAL_manual
   qual_text_mlflow_run_id: e1a1cb95017a499b81f2335c0733ec48
   qual_fit_type: 'simultaneous' # text_only/submodels_only/simultaneous/text_first
+
+train_tf:
+  mlflow_dir: mlruns
+  conda_yaml_path: './conda.yaml'
+  mlflow_tracking_dir: ./mlruns
+  mlflow_experiment_name: ${train.target_var}_tf_manual
+  train_path: ${split_train_test.train_path}
+  text_var: ${proc_spacy.text_var}
+  target_var: QUALc  
+  invert_target: False
+
+  model: distilbert
+  submodel: distilbert-base-uncased
+
+  num_train_epochs: 3
   
 
 test:
