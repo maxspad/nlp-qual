@@ -77,10 +77,18 @@ train_tf:
   target_var: QUALc  
   invert_target: False
 
+  n_splits: 3
+  test_size: 0.15
+  random_state: 43
+
   model: distilbert
   submodel: distilbert-base-uncased
 
-  num_train_epochs: 3
+  num_train_epochs: 1
+  output_dir: tf_outputs
+  overwrite_output_dir: True
+  use_multiprocessing: False
+  use_multiprocessing_for_evaluation: False
   
 
 test:

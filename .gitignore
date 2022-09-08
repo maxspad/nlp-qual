@@ -95,3 +95,8 @@ multirun/
 
 # mlflow
 mlruns/
+
+# transformers
+cache_dir/
+tf_outputs/
+runs/
