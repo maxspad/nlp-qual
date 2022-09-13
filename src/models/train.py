@@ -67,6 +67,7 @@ def main(cfg : DictConfig):
     
         # Add the model to the pipeline at the end
         mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
+
         if cfg.target_var == 'QUAL':
             pipe_steps_QUAL = get_pipe_steps_for_QUAL(cfg)
             log.info(f'Target {cfg.target_var}, subtype {cfg.qual_fit_type}')
@@ -78,12 +79,23 @@ def main(cfg : DictConfig):
                     ))),
                     ('mdl', mdl)
                 ))
+
             elif cfg.qual_fit_type == 'text_only':
                 pipe_steps = pipe_steps_subvars + [('mdl', mdl)]
                 pipe = Pipeline(pipe_steps)
+
             elif (cfg.qual_fit_type == 'submodels_only') or (cfg.qual_fit_type == 'text_first'):
                 pipe_steps = pipe_steps_QUAL + [('mdl', mdl)]
                 pipe = Pipeline(pipe_steps)
+
+            elif (cfg.qual_fit_type == 'simple_sum'):
+                submodels, sm_names = load_all_submodels(cfg)
+
+                ct_steps = [(f'{n}ft', FunctionTransformer(submodel_function(sm, decision_function=False)), [0]) for n, sm in zip(sm_names, submodels)]
+                pipe_steps = [
+                    ('ct', ColumnTransformer(ct_steps)),
+                    ()
+                ]
             else:
                 raise ValueError('qual_fit_type must be one of text_only/submodels_only/simultaneous/text_first')
         else:            
@@ -122,9 +134,9 @@ def main(cfg : DictConfig):
 
         return res_mn['mean_test_balanced_accuracy']
 
-def submodel_function(sm):
+def submodel_function(sm, decision_function=True):
     def _submodel_func(X, y=None):
-        df = sm.decision_function(X)
+        df = sm.decision_function(X) if decision_function else sm.predict(X)
         if len(df.shape) < 2:
             df = df[:, None]
         # print(df.shape)
@@ -143,13 +155,18 @@ def load_submodel(mlflow_dir, mlflow_exp_name, mlflow_run_id):
         clf = pickle.load(f)
     return clf
 
-def get_pipe_steps_for_QUAL(cfg: DictConfig):
+def load_all_submodels(cfg: DictConfig):
     log.info('Loading submodels...')
     q1 = load_submodel(cfg.mlflow_dir, cfg.q1_mlflow_exp_name, cfg.q1_mlflow_run_id)
     q2 = load_submodel(cfg.mlflow_dir, cfg.q2_mlflow_exp_name, cfg.q2_mlflow_run_id)
     q3 = load_submodel(cfg.mlflow_dir, cfg.q3_mlflow_exp_name, cfg.q3_mlflow_run_id)
     submodels = [q1, q2, q3]
     sm_names = ['q1','q2','q3']
+    return submodels, sm_names
+
+def get_pipe_steps_for_QUAL(cfg: DictConfig):
+    submodels, sm_names = load_all_submodels(cfg)
+
     if cfg.qual_fit_type == 'text_first':
         submodels.append(load_submodel(cfg.mlflow_dir, cfg.qual_text_mlflow_exp_name, cfg.qual_text_mlflow_run_id))
         sm_names.append('qt')

@@ -37,8 +37,8 @@ train:
   mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
-  target_var: Q1
-  invert_target: True
+  target_var: Q2i
+  invert_target: False
   random_seed: 43
   punct: True
   pron: True
@@ -96,8 +96,8 @@ train_tf:
 
 test:
   mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: 220913_114531_Q1_1000t
-  mlflow_run_id: c9882bab307e4452bd09166e4d059fcc
+  mlflow_source_experiment_name: 220913_122406_Q2i_1000t
+  mlflow_run_id: c6f0a55bdb2c463fb159b0e3e8d42024
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
