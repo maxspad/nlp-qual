@@ -95,6 +95,7 @@ multirun/
 
 # mlflow
 mlruns/
+mlruns2/
 
 # transformers
 cache_dir/

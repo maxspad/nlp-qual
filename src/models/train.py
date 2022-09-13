@@ -33,7 +33,7 @@ CONF_FILE = f'{CONF_FOLDER}/{CONF_NAME}.yaml'
 @hydra.main(version_base=None, config_path=f'{CONF_PATH}/{CONF_FOLDER}', config_name=CONF_NAME)
 def main(cfg : DictConfig):
     cfg = cfg.train 
-
+    mlflow.set_tracking_uri(cfg.mlflow_tracking_dir)
     mlflow.set_experiment(experiment_name=cfg.mlflow_experiment_name)
     with mlflow.start_run():
         log.info('Training model...')

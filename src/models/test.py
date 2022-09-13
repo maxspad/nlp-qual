@@ -29,7 +29,7 @@ def main(cfg: DictConfig):
 
     log.info('Evaluating model on test set...')
     log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
-
+    mlflow.set_tracking_uri(cfg.mlflow_dir)
     # Load the trained model
     exper = mlflow.get_experiment_by_name(cfg.mlflow_source_experiment_name)
     log.info(f'Loaded experiment {cfg.mlflow_source_experiment_name} with ID {exper.experiment_id} at artifact location {exper.artifact_location}')
