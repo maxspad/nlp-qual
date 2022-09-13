@@ -84,11 +84,14 @@ train_tf:
   model: distilbert
   submodel: distilbert-base-uncased
 
-  num_train_epochs: 1
-  output_dir: tf_outputs
-  overwrite_output_dir: True
-  use_multiprocessing: False
-  use_multiprocessing_for_evaluation: False
+  st_args:
+    num_train_epochs: 1
+    output_dir: tf_outputs
+    overwrite_output_dir: True
+    use_multiprocessing: False
+    use_multiprocessing_for_evaluation: False
+
+  objective_metric: mean_balanced_accuracy
   
 
 test:
@@ -117,24 +120,36 @@ hydra:
     direction: maximize
     study_name: test_study
     storage: null
-    n_trials: 250
-    n_jobs: 14
+    n_trials: 10
+    n_jobs: 1
     params:
-      train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
-      train.model_c: choice(1,0.1,0.01,0.001,0.0001)
-      train.punct: choice(True, False)
-      train.pron: choice(True, False)
-      train.stop: choice(True, False)
-      train.lemma: choice(True, False)
-      train.ngram_min: 1
-      train.ngram_max: range(1,8)
-      train.max_df: interval(0.1, 1.0)
-      train.min_df: range(1,30)
-      train.token_count: choice(True, False)
-      train.pos_counts: choice(True, False)
-      train.ent_counts: choice(True, False)
-      train.vectors: choice(True, False)
-      train.class_weight: balanced,null
+      
+
+# hydra:
+#   sweeper:
+#     sampler:
+#       seed: 43
+#     direction: maximize
+#     study_name: test_study
+#     storage: null
+#     n_trials: 250
+#     n_jobs: 14
+#     params:
+#       train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
+#       train.model_c: choice(1,0.1,0.01,0.001,0.0001)
+#       train.punct: choice(True, False)
+#       train.pron: choice(True, False)
+#       train.stop: choice(True, False)
+#       train.lemma: choice(True, False)
+#       train.ngram_min: 1
+#       train.ngram_max: range(1,8)
+#       train.max_df: interval(0.1, 1.0)
+#       train.min_df: range(1,30)
+#       train.token_count: choice(True, False)
+#       train.pos_counts: choice(True, False)
+#       train.ent_counts: choice(True, False)
+#       train.vectors: choice(True, False)
+#       train.class_weight: balanced,null
 
 
 

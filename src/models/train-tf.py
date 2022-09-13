@@ -72,6 +72,8 @@ def main(cfg : DictConfig):
         model = fit_model(cfg, df)  
         log.info('Saving final model...')
         mlflow.log_artifact(cfg.output_dir)
+
+        return res_mn[cfg.objective_metric]
     
     
 def fit_model(cfg: DictConfig, train_df):
