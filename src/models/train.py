@@ -15,6 +15,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import cross_validate
 import sklearn.metrics as mets
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 # configuration management
 import hydra
@@ -94,8 +95,9 @@ def main(cfg : DictConfig):
                 ct_steps = [(f'{n}ft', FunctionTransformer(submodel_function(sm, decision_function=False)), [0]) for n, sm in zip(sm_names, submodels)]
                 pipe_steps = [
                     ('ct', ColumnTransformer(ct_steps)),
-                    ()
+                    ('mdl', SumEstimator())
                 ]
+                pipe = Pipeline(pipe_steps)
             else:
                 raise ValueError('qual_fit_type must be one of text_only/submodels_only/simultaneous/text_first')
         else:            
@@ -133,6 +135,18 @@ def main(cfg : DictConfig):
         mlflow.sklearn.log_model(pipe, 'model')
 
         return res_mn['mean_test_balanced_accuracy']
+
+class SumEstimator(BaseEstimator, ClassifierMixin):
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y):
+        return self
+
+    def predict(self, X):
+        return X.sum(1)
+
 
 def submodel_function(sm, decision_function=True):
     def _submodel_func(X, y=None):

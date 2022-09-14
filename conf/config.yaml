@@ -37,7 +37,7 @@ train:
   mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: ${proc_spacy.text_var}_spacy
-  target_var: Q2i
+  target_var: QUAL
   invert_target: False
   random_seed: 43
   punct: True
@@ -57,15 +57,15 @@ train:
   class_weight: 'balanced'
 
   # only applies if training QUAL
-  q1_mlflow_exp_name: 220812_123209_q1_10000t_random
-  q1_mlflow_run_id: 059651b7006d4e0099fdf410fad12532
-  q2_mlflow_exp_name: hparam_simplification
-  q2_mlflow_run_id: 8a2417c0ca784c12a4cccd8abca64a58
-  q3_mlflow_exp_name: 220809_102311_Q3_1000t_rand_inv
-  q3_mlflow_run_id: 9598a48f12ef4e11b0be907cbe4eb898
+  q1_mlflow_exp_name: 220913_114531_Q1_1000t
+  q1_mlflow_run_id: c9882bab307e4452bd09166e4d059fcc
+  q2_mlflow_exp_name: 220913_122406_Q2i_1000t
+  q2_mlflow_run_id: c6f0a55bdb2c463fb159b0e3e8d42024
+  q3_mlflow_exp_name: 220913_124429_Q3i_1000t
+  q3_mlflow_run_id: 1cc2ead791d341cc8445317fbe9bf3ad
   qual_text_mlflow_exp_name: QUAL_manual
   qual_text_mlflow_run_id: e1a1cb95017a499b81f2335c0733ec48
-  qual_fit_type: 'simultaneous' # text_only/submodels_only/simultaneous/text_first
+  qual_fit_type: 'simple_sum' # text_only/submodels_only/simultaneous/text_first/simple_sum
 
 train_tf:
   mlflow_dir: mlruns
@@ -96,8 +96,8 @@ train_tf:
 
 test:
   mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: 220913_122406_Q2i_1000t
-  mlflow_run_id: c6f0a55bdb2c463fb159b0e3e8d42024
+  mlflow_source_experiment_name: 220913_124429_Q3i_1000t
+  mlflow_run_id: 1cc2ead791d341cc8445317fbe9bf3ad
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
