@@ -41,35 +41,47 @@ def main(cfg : DictConfig):
         log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
         mlflow.log_params(OmegaConf.to_object(cfg))
         
+        # Load data
         log.info(f'Loading data from {cfg.train_path}')
         df = pd.read_pickle(cfg.train_path)
         log.info(f'Data is shape {df.shape}')
+
+        # Drop any blanks
         log.info(f'There are {df[cfg.text_var].isna().sum()} blanks in {cfg.text_var}, dropping')
         log.info(f'There are {df[cfg.target_var].isna().sum()} blanks in {cfg.target_var}, dropping')
         df = df.dropna(subset=[cfg.text_var, cfg.target_var])
         log.debug(f'Data head\n{df.head()}')
 
+        # Drop all level 4 if requested
         if (cfg.target_var == 'QUAL') and (cfg.qual_exclude_level4):
             log.warning('Filtering out level 4 as requested!')
             qual_level4 = df[cfg.target_var] == 4
             log.warning(f'Dropping {qual_level4.sum()} items.')
             df = df[~qual_level4]
 
+        # split out comments and labels
         X = df[cfg.text_var].values.copy()[:, None]
         y = df[cfg.target_var].values.copy()
+
+        # if multi_level, warn that the metrics will be different
         y_value_counts = pd.Series(y).value_counts().sort_index()
         multi_level = len(y_value_counts) > 2
         if multi_level:
             log.warning(f'Target {cfg.target_var} has {len(y_value_counts)} levels! Metrics will be multi-level.')
+
+        # invert target if requested
         if cfg.invert_target:
             if multi_level:
                 log.warning(f'Cannot invert a multi-level target! Ignoring')
             else:
                 y = y + 1
                 y[y == 2] = 0
+
+        # Report the value_counts and data shape
         log.info(f'Y value counts\n{y_value_counts}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
+        
         pipe_steps_subvars = get_pipe_steps_for_subvars(cfg)
     
         # Add the model to the pipeline at the end
