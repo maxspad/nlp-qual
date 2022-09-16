@@ -49,6 +49,12 @@ def main(cfg: DictConfig):
         log.info(f'Data is shape {df.shape}')
         log.debug(f'Data head\n{df.head()}')
 
+        if (cfg.target_var == 'QUAL') and (cfg.qual_exclude_level4):
+            log.warning('Filtering out level 4 as requested!')
+            qual_level4 = df[cfg.target_var] == 4
+            log.warning(f'Dropping {qual_level4.sum()} items.')
+            df = df[~qual_level4]
+
         X = df[['comment_spacy']].values.copy()
         y = df[cfg.target_var].values.copy()
         y_value_counts = pd.Series(y).value_counts().sort_index()

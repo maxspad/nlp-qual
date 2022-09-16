@@ -49,6 +49,12 @@ def main(cfg : DictConfig):
         df = df.dropna(subset=[cfg.text_var, cfg.target_var])
         log.debug(f'Data head\n{df.head()}')
 
+        if (cfg.target_var == 'QUAL') and (cfg.qual_exclude_level4):
+            log.warning('Filtering out level 4 as requested!')
+            qual_level4 = df[cfg.target_var] == 4
+            log.warning(f'Dropping {qual_level4.sum()} items.')
+            df = df[~qual_level4]
+
         X = df[cfg.text_var].values.copy()[:, None]
         y = df[cfg.target_var].values.copy()
         y_value_counts = pd.Series(y).value_counts().sort_index()
@@ -138,10 +144,12 @@ def main(cfg : DictConfig):
 
 class SumEstimator(BaseEstimator, ClassifierMixin):
 
-    def __init__(self):
-        pass
+    def __init__(self, max_iter=10000):
+        self.max_iter = max_iter
+        
 
     def fit(self, X, y):
+        self.n_iter_ = 1
         return self
 
     def predict(self, X):
@@ -250,13 +258,16 @@ def calculate_metrics(y, p, s):
             
             for j, v in enumerate(cm[c, :]):
                 toret[f'cm_{c}_{j}'] = v
-            toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2)
-            toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3)
+            toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2) if s is not None else np.nan
+            toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3) if s is not None else np.nan
     return toret 
 
 def _model_scorer(clf, X, y):
     p = clf.predict(X)
-    s = clf.decision_function(X)
+    try:
+        s = clf.decision_function(X)
+    except AttributeError:
+        s = None
     return calculate_metrics(y, p, s)
 
 if __name__ == "__main__":
