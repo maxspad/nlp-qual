@@ -71,7 +71,7 @@ train:
   q3_mlflow_run_id: 1cc2ead791d341cc8445317fbe9bf3ad
   qual_text_mlflow_exp_name: QUAL_manual
   qual_text_mlflow_run_id: e1a1cb95017a499b81f2335c0733ec48
-  qual_fit_type: 'submodels_only' # text_only/submodels_only/simultaneous/text_first/simple_sum
+  qual_fit_type: 'simultaneous' # text_only/submodels_only/simultaneous/text_first/simple_sum
 
 train_tf:
   mlflow_dir: mlruns
@@ -102,8 +102,8 @@ train_tf:
 
 test:
   mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: QUAL_manual
-  mlflow_run_id: cbf22ee81c9c4225ae649f4f105f0585
+  mlflow_source_experiment_name: 220916_093753_QUAL_excl4_text_only_1000t
+  mlflow_run_id: 3c47a15348d445269ee931ddacb83045
   test_path: ${split_train_test.test_path}
   target_var: ${train.target_var}
   invert_target: ${train.invert_target}
