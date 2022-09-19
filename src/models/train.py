@@ -5,6 +5,8 @@ import pickle
 
 import warnings
 
+from src.skspacy.skspacy import SpacyTransformer
+
 # Spacy NLP / sklearn
 from ..skspacy import SpacyTokenFilter, SpacyDocFeats
 from sklearn.pipeline import Pipeline
@@ -81,7 +83,7 @@ def main(cfg : DictConfig):
         log.info(f'Y value counts\n{y_value_counts}')
         log.debug(f'X shape {X.shape} / y shape {y.shape}')
 
-        
+
         pipe_steps_subvars = get_pipe_steps_for_subvars(cfg)
     
         # Add the model to the pipeline at the end
@@ -200,19 +202,21 @@ def load_all_submodels(cfg: DictConfig):
 
 def get_pipe_steps_for_QUAL(cfg: DictConfig):
     submodels, sm_names = load_all_submodels(cfg)
-
+    spacytf = SpacyTransformer()
     if cfg.qual_fit_type == 'text_first':
         submodels.append(load_submodel(cfg.mlflow_dir, cfg.qual_text_mlflow_exp_name, cfg.qual_text_mlflow_run_id))
         sm_names.append('qt')
 
     ct_steps = [(f'{n}ft', FunctionTransformer(submodel_function(sm)), [0]) for n, sm in zip(sm_names, submodels)]
     pipe_steps = [
+        ('spacytf', spacytf),
         ('ct', ColumnTransformer(ct_steps)),
         ('scaler', MinMaxScaler()),
     ]
     return pipe_steps
 
 def get_pipe_steps_for_subvars(cfg: DictConfig):
+    spacytf = SpacyTransformer()
     tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
     vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
     docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
@@ -220,11 +224,13 @@ def get_pipe_steps_for_subvars(cfg: DictConfig):
     # mdl = LinearSVC(C=cfg.model_c, class_weight=cfg.class_weight, random_state=cfg.random_seed, max_iter=cfg.max_iter)
     if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
         pipe_steps = [
+            ('spacytf', spacytf),
             ('tokfilt', tokfilt),
             ('vec', vec)
         ]
     else:
         pipe_steps = [
+            ('spacytf', spacytf),
             ('ct', ColumnTransformer((
                 ('bowpipe', Pipeline((
                     ('tokfilt', tokfilt),

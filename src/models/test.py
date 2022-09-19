@@ -1,3 +1,5 @@
+from . import train_helpers as th
+
 # configuration management
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -44,29 +46,8 @@ def main(cfg: DictConfig):
         log.info('Evaluating model...')
         mlflow.log_params(OmegaConf.to_object(cfg))
 
-        log.info(f'Loading data from {cfg.test_path}')
-        df = pd.read_pickle(cfg.test_path)
-        log.info(f'Data is shape {df.shape}')
-        log.debug(f'Data head\n{df.head()}')
+        X, y = th.load_data(cfg, train=False)
 
-        if (cfg.target_var == 'QUAL') and (cfg.qual_exclude_level4):
-            log.warning('Filtering out level 4 as requested!')
-            qual_level4 = df[cfg.target_var] == 4
-            log.warning(f'Dropping {qual_level4.sum()} items.')
-            df = df[~qual_level4]
-
-        X = df[['comment_spacy']].values.copy()
-        y = df[cfg.target_var].values.copy()
-        y_value_counts = pd.Series(y).value_counts().sort_index()
-        multi_level = len(y_value_counts) > 2
-        if multi_level:
-            log.warning(f'Target {cfg.target_var} has {len(y_value_counts)} levels! Metrics will be multi-level.')
-        if cfg.invert_target:
-            if multi_level:
-                log.warning(f'Cannot invert a multi-level target! Ignoring')
-            else:
-                y = y + 1
-                y[y == 2] = 0
         p = clf.predict(X)
         s = clf.decision_function(X)
 
