@@ -116,6 +116,9 @@ def main(cfg : DictConfig):
         )
         masterdb[cfg.qual_condense_col_name] = masterdb[cfg.qual_condense_col_name].astype('int')
 
+    log.info(f'Changing nan comments ({masterdb[cfg.text_var].isna().sum()}) to blanks...')
+    masterdb[cfg.text_var].fillna('blank', inplace=True)
+
     # output the result
     log.info(f'Saving to {cfg.output_path}')
     masterdb.to_excel(cfg.output_path)

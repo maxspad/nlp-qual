@@ -11,6 +11,7 @@ make_dataset:
   q3_invert_col_name: Q3i
   qual_condense: True
   qual_condense_col_name: QUALc
+  text_var: comment
 
 proc_spacy:
   dataset_path: ${make_dataset.output_path}
@@ -38,17 +39,24 @@ train:
   mlflow_experiment_name: ${train.target_var}_manual
   train_path: ${split_train_test.train_path}
   text_var: comment
+  random_seed: 43
   # text_var: ${proc_spacy.text_var}_spacy
-
-  spacy_prog: True
-  spacy_procs: 12
 
   # target variable options
   target_var: QUAL
   invert_target: False
   qual_exclude_level4: False
-  random_seed: 43
 
+  # spacy-specific processing options
+  spacy_prog: True
+  spacy_procs: 12
+
+  # cross-validation options
+  cv_folds: 5
+  
+  # augmentation options
+  do_aug: True
+  
   # hyperparams
   punct: True
   pron: True

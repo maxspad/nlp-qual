@@ -16,7 +16,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_validate, KFold
 
 # configuration management
 import hydra
@@ -41,21 +41,33 @@ def main(cfg : DictConfig):
         
         # Load data
         X, y = th.load_data(cfg)
-        augtf = th.SynonymAugTransformer()
-        X = augtf.fit_transform(X)
-        y = np.concatenate((y,y))
 
         # Prepare pipeline
         pipe = make_pipeline(cfg)
         log.info(f'Pipeline is\n{pipe}')
 
-        log.info('Cross validating model...')
+        log.info(f'Cross validating model using {cfg.cv_folds} folds...')
         n_failed_converge = 0
-        res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1, return_estimator=True)
-        n_failed_converge = sum([estim[-1].n_iter_ >= estim[-1].get_params()['max_iter'] for estim in res['estimator']])
-        if n_failed_converge > 0:
-            log.warning(f'{n_failed_converge} folds failed to converge!')
-        del res['estimator']
+        cv = KFold(n_splits=cfg.cv_folds)
+        res = []
+        n_failed_converge = 0
+        for i, idxs in enumerate(cv.split(X)):
+            log.info(f'Fold {i}')
+            train_idxs, test_idxs = idxs
+            Xtr, ytr = X[train_idxs, :], y[train_idxs]
+            Xte, yte = X[test_idxs, :], y[test_idxs]
+
+            Xtr, ytr = augment_train(cfg, Xtr, ytr) # identity func if cfg.do_aug is False
+
+            pipe = pipe.fit(Xtr, ytr)
+            res.append(_model_scorer(pipe, Xte, yte))
+            n_failed_converge += (pipe[-1].n_iter_ >= pipe[-1].get_params()['max_iter'])
+                
+        # res = cross_validate(pipe, X, y, scoring=_model_scorer, cv=5, n_jobs=1, return_estimator=True)
+        # n_failed_converge = sum([estim[-1].n_iter_ >= estim[-1].get_params()['max_iter'] for estim in res['estimator']])
+        # if n_failed_converge > 0:
+        #     log.warning(f'{n_failed_converge} folds failed to converge!')
+        # del res['estimator']
 
         res = pd.DataFrame(res)
         res_mn = pd.DataFrame(res.mean()).T.rename(lambda x: 'mean_' + x, axis=1)
@@ -72,12 +84,15 @@ def main(cfg : DictConfig):
         mlflow.log_artifact(CONF_FILE)
 
         log.info('Fitting final model...')
+        X, y = augment_train(cfg, X, y)
         pipe.fit(X, y)     
         log.info('Saving final model...')   
         mlflow.sklearn.log_model(pipe, 'model')
 
-        return res_mn['mean_test_balanced_accuracy']
+        return res_mn['mean_balanced_accuracy']
 
+def augment_train(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
+    return Xtr, ytr
 
 def make_pipeline(cfg: DictConfig):
 
@@ -135,7 +150,6 @@ def get_pipe_steps_for_subvars(cfg: DictConfig):
     if not any([cfg.token_count, cfg.pos_counts, cfg.ent_counts, cfg.vectors]):
         # if no count fatures, we don't need the ColumnTransformer
         pipe_steps = [
-            # ('syntf', syntf), # TODO
             ('spacytf', spacytf),
             ('tokfilt', tokfilt),
             ('vec', vec)
@@ -143,7 +157,6 @@ def get_pipe_steps_for_subvars(cfg: DictConfig):
     else:
         # need a more complex pipeline if using count features
         pipe_steps = [
-            # ('syntf', syntf), # TODO
             ('spacytf', spacytf),
             ('ct', ColumnTransformer((
                 ('bowpipe', Pipeline((

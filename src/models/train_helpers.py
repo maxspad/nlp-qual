@@ -35,7 +35,7 @@ def load_data(cfg : DictConfig, train=True):
             df = df[~qual_level4]
 
         # split out comments and labels
-        X = df[cfg.text_var].values.copy()[:, None]
+        X = df[cfg.text_var].values.copy()[:, None].astype('str')
         y = df[cfg.target_var].values.copy()
 
         # if multi_level, warn that the metrics will be different

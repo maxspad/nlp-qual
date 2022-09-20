@@ -216,7 +216,7 @@ def get_pipe_steps_for_QUAL(cfg: DictConfig):
     return pipe_steps
 
 def get_pipe_steps_for_subvars(cfg: DictConfig):
-    spacytf = SpacyTransformer()
+    spacytf = SpacyTransformer(prog=cfg.spacy_prog, procs=cfg.spacy_procs)
     tokfilt = SpacyTokenFilter(punct=cfg.punct, lemma=cfg.lemma, stop=cfg.stop, pron=cfg.pron)
     vec = CountVectorizer(max_df=cfg.max_df, min_df=cfg.min_df, ngram_range=(cfg.ngram_min, cfg.ngram_max))
     docfeats = SpacyDocFeats(token_count=cfg.token_count, pos_counts=cfg.pos_counts, ent_counts=cfg.ent_counts, vectors=cfg.vectors)
