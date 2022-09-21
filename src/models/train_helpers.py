@@ -125,3 +125,40 @@ class SynonymAugTransformer(BaseEstimator, TransformerMixin):
             force_reload=self.force_reload, verbose=self.verbose)
         augmented = np.array(aug.augment(data))[:,None]
         return np.vstack((X, augmented))
+
+
+def augment_train(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
+    if cfg.do_aug:
+        levels, counts = np.unique(ytr, return_counts=True)
+        highest_count = np.max(counts)
+        most_freq_level = levels[np.argmax(counts)]
+        target_highest_count = np.ceil(cfg.aug_factor * highest_count)
+        match_count = np.ceil(cfg.match_factor * target_highest_count)
+        aug_X = []
+        aug_y = []
+        for lvl in levels:
+            X_lvl, y_lvl = Xtr[ytr == lvl], ytr[ytr == lvl]
+            aug_X_lvl, aug_y_lvl = do_upsample_aug(X_lvl, y_lvl, 
+                target_highest_count if lvl == most_freq_level else match_count)
+            aug_X.append(aug_X_lvl)
+            aug_y.append(aug_y_lvl)
+
+        Xtr_aug = np.vstack(aug_X)
+        ytr_aug = np.concatenate(aug_y)
+        
+        return Xtr_aug, ytr_aug
+    else:
+        return Xtr, ytr
+
+def do_upsample_aug(X: np.ndarray, y: np.ndarray, target_count: int):
+    # the actual target is len(X) - target_count
+    n_to_sample = int(target_count - X.shape[0])
+    if n_to_sample <= 0:
+        log.info(f'Target count is {target_count}, X length is {X.shape[0]}, no need to upsample')
+        return X, y
+    sample_idxs = np.random.randint(0, X.shape[0], n_to_sample)
+    X_sample = X[sample_idxs, :]
+    y_sample = y[sample_idxs]
+    auger = SynonymAug()
+    X_sample_aug = np.array(auger.augment(X_sample[:, 0].tolist()))[:,None]
+    return np.vstack((X, X_sample_aug)), np.concatenate((y, y_sample))

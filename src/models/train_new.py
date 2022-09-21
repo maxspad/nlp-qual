@@ -48,7 +48,7 @@ def main(cfg : DictConfig):
 
         log.info(f'Cross validating model using {cfg.cv_folds} folds...')
         n_failed_converge = 0
-        cv = KFold(n_splits=cfg.cv_folds)
+        cv = KFold(n_splits=cfg.cv_folds, shuffle=True, random_state=cfg.random_seed)
         res = []
         n_failed_converge = 0
         for i, idxs in enumerate(cv.split(X)):
@@ -56,8 +56,9 @@ def main(cfg : DictConfig):
             train_idxs, test_idxs = idxs
             Xtr, ytr = X[train_idxs, :], y[train_idxs]
             Xte, yte = X[test_idxs, :], y[test_idxs]
-
-            Xtr, ytr = augment_train(cfg, Xtr, ytr) # identity func if cfg.do_aug is False
+            log.info(f'Value counts BEFORE augmentation:\n{pd.Series(ytr).value_counts()}')
+            Xtr, ytr = th.augment_train(cfg, Xtr, ytr) # identity func if cfg.do_aug is False
+            log.info(f'Value counts AFTER augmentation:\n{pd.Series(ytr).value_counts()}')
 
             pipe = pipe.fit(Xtr, ytr)
             res.append(_model_scorer(pipe, Xte, yte))
@@ -84,15 +85,12 @@ def main(cfg : DictConfig):
         mlflow.log_artifact(CONF_FILE)
 
         log.info('Fitting final model...')
-        X, y = augment_train(cfg, X, y)
+        X, y = th.augment_train(cfg, X, y)
         pipe.fit(X, y)     
         log.info('Saving final model...')   
         mlflow.sklearn.log_model(pipe, 'model')
 
         return res_mn['mean_balanced_accuracy']
-
-def augment_train(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
-    return Xtr, ytr
 
 def make_pipeline(cfg: DictConfig):
 
