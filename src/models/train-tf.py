@@ -30,6 +30,7 @@ CONF_FILE = f'{CONF_FOLDER}/{CONF_NAME}.yaml'
 @hydra.main(version_base=None, config_path=f'{CONF_PATH}/{CONF_FOLDER}', config_name=CONF_NAME)
 def main(cfg : DictConfig):
     cfg = cfg.train_tf
+    mlflow.set_tracking_uri(cfg.mlflow_tracking_dir)
 
     X, y = th.load_data(cfg)
 
@@ -38,12 +39,17 @@ def main(cfg : DictConfig):
 
     mlflow.set_experiment(experiment_name=cfg.mlflow_experiment_name)
     with mlflow.start_run():
-        df = pd.DataFrame({'text': X[:,0], 'labels': y})
         splitter = ShuffleSplit(n_splits=cfg.n_splits, test_size=cfg.test_size, random_state=cfg.random_state)
         fold_results = []
-        for train_idx, test_idx in splitter.split(df):
-            train_df = df.iloc[train_idx,:]
-            test_df = df.iloc[test_idx,:]
+        for train_idx, test_idx in splitter.split(X):
+            Xtr, ytr = X[train_idx, :], y[train_idx]
+            Xte, yte = X[test_idx, :], y[test_idx]
+            
+            Xtr, ytr = th.augment_train(cfg, Xtr, ytr)
+            log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
+
+            train_df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
+            test_df = pd.DataFrame({'text': Xte[:,0], 'labels': yte})
             
             log.info('Training model...')
             model = fit_model(cfg, train_df)
@@ -68,21 +74,28 @@ def main(cfg : DictConfig):
         mlflow.log_artifact(cfg.conda_yaml_path)
         mlflow.log_artifact(CONF_FILE)
 
-        log.info('Fitting final model...')
-        model = fit_model(cfg, df)  
-        log.info('Saving final model...')
-        mlflow.log_artifact(cfg.output_dir)
+        if cfg.fit_final:
+            log.info('Fitting final model...')
+            Xtr, ytr = th.augment_train(cfg, X, y)
+            log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
+            df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
+            model = fit_model(cfg, df)  
+            log.info('Saving final model...')
+            mlflow.log_artifact(cfg.st_args.output_dir)
 
         return res_mn[cfg.objective_metric]
     
     
 def fit_model(cfg: DictConfig, train_df):
         model_args = ClassificationArgs(
-            num_train_epochs=cfg.num_train_epochs,
-            output_dir=cfg.output_dir,
-            overwrite_output_dir=cfg.overwrite_output_dir,
-            use_multiprocessing=False,
-            use_multiprocessing_for_evaluation=False
+            num_train_epochs=cfg.st_args.num_train_epochs,
+            output_dir=cfg.st_args.output_dir,
+            overwrite_output_dir=cfg.st_args.overwrite_output_dir,
+            use_multiprocessing=cfg.st_args.use_multiprocessing,
+            use_multiprocessing_for_evaluation=cfg.st_args.use_multiprocessing_for_evaluation,
+            manual_seed=cfg.random_state,
+            learning_rate=cfg.st_args.learning_rate,
+            train_batch_size=cfg.st_args.train_batch_size
         )
         model = ClassificationModel(
             cfg.model,
@@ -100,7 +113,7 @@ def calculate_metrics(y, p, s):
     toret = {
         'balanced_accuracy': mets.balanced_accuracy_score(y, p),
         'accuracy': mets.accuracy_score(y, p),
-        'roc_auc': mets.roc_auc_score(y, s) if n_classes == 2 else np.nan,
+        'roc_auc': np.nan, # mets.roc_auc_score(y, s) if n_classes == 2 else np.nan,
         'f1': mets.f1_score(y, p, average=avg),
         'precision': mets.precision_score(y, p, average=avg),
         'recall': mets.recall_score(y, p, average=avg),
@@ -128,15 +141,6 @@ def calculate_metrics(y, p, s):
             toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2)
             toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3)
     return toret
-
-
-
-    train_df, test_df = train_test_split(df, test_size=0.25)
-    model_args = ClassificationArgs(num_train_epochs=cfg.num_train_epochs, output_dir='st_outputs', use_multiprocessing=False, overwrite_output_dir=True, use_multiprocessing_for_evaluation=False)
-    model = ClassificationModel(cfg.model, cfg.submodel, args=model_args, num_labels=len(df.labels.unique()))
-    # log.info(train_df.labels.value_counts())
-    model.train_model(train_df)
-    result, model_outputs, wrong_predictions = model.eval_model(test_df, acc=mets.accuracy_score, bac=mets.balanced_accuracy_score)
 
 if __name__ == "__main__":
     main()

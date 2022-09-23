@@ -5,7 +5,9 @@ import numpy as np
 
 # ML/NLP
 import sklearn.metrics as mets
+from sklearn.utils import shuffle
 from nlpaug.augmenter.word.synonym import SynonymAug
+from nlpaug.augmenter.word.context_word_embs import ContextualWordEmbsAug
 from sklearn.base import BaseEstimator, TransformerMixin
 
 # configuration management
@@ -139,18 +141,20 @@ def augment_train(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
         for lvl in levels:
             X_lvl, y_lvl = Xtr[ytr == lvl], ytr[ytr == lvl]
             aug_X_lvl, aug_y_lvl = do_upsample_aug(X_lvl, y_lvl, 
-                target_highest_count if lvl == most_freq_level else match_count)
+                target_highest_count if lvl == most_freq_level else match_count, do_replacement=cfg.do_replacement)
             aug_X.append(aug_X_lvl)
             aug_y.append(aug_y_lvl)
 
         Xtr_aug = np.vstack(aug_X)
         ytr_aug = np.concatenate(aug_y)
+        # these are stacked according to level and need to be shuffled
+        Xtr_aug, ytr_aug = shuffle(Xtr_aug, ytr_aug, random_state=cfg.random_state)
         
         return Xtr_aug, ytr_aug
     else:
         return Xtr, ytr
 
-def do_upsample_aug(X: np.ndarray, y: np.ndarray, target_count: int):
+def do_upsample_aug(X: np.ndarray, y: np.ndarray, target_count: int, do_replacement=True):
     # the actual target is len(X) - target_count
     n_to_sample = int(target_count - X.shape[0])
     if n_to_sample <= 0:
@@ -159,6 +163,47 @@ def do_upsample_aug(X: np.ndarray, y: np.ndarray, target_count: int):
     sample_idxs = np.random.randint(0, X.shape[0], n_to_sample)
     X_sample = X[sample_idxs, :]
     y_sample = y[sample_idxs]
-    auger = SynonymAug()
-    X_sample_aug = np.array(auger.augment(X_sample[:, 0].tolist()))[:,None]
+    if do_replacement:
+        auger = SynonymAug()
+        # auger = ContextualWordEmbsAug(device='cuda')
+        X_sample_aug = np.array(auger.augment(X_sample[:, 0].tolist()))[:,None]
+    else:
+        X_sample_aug = X_sample
     return np.vstack((X, X_sample_aug)), np.concatenate((y, y_sample))
+
+
+def tf_calculate_metrics(y, p, s):
+    cm = mets.confusion_matrix(y, p)
+    n_classes = cm.shape[0]
+    avg = 'binary' if n_classes == 2 else 'macro'
+    toret = {
+        'balanced_accuracy': mets.balanced_accuracy_score(y, p),
+        'accuracy': mets.accuracy_score(y, p),
+        'roc_auc': np.nan, # mets.roc_auc_score(y, s) if n_classes == 2 else np.nan,
+        'f1': mets.f1_score(y, p, average=avg),
+        'precision': mets.precision_score(y, p, average=avg),
+        'recall': mets.recall_score(y, p, average=avg),
+        'mae': mets.mean_absolute_error(y, p)
+    }
+
+    if n_classes == 2:
+        toret['tp'] = cm[1,1]
+        toret['tn'] = cm[0,0]
+        toret['fp'] = cm[0,1]
+        toret['fn'] = cm[1,0]
+    else:
+        precs, recs, f1s, supps = mets.precision_recall_fscore_support(y, p, average=None, labels=list(range(n_classes)))
+        for c, prfs in enumerate(zip(precs, recs, f1s, supps)):
+        # for c in range(n_classes):
+            # prec, rec, f1, supp = mets.precision_recall_fscore_support(y, p, average='binary', pos_label=c)
+            prec, rec, f1, supp = prfs
+            toret[f'prec_{c}'] = prec
+            toret[f'rec_{c}'] = rec
+            toret[f'f1_{c}'] = f1 
+            toret[f'supp_{c}'] = supp
+            
+            for j, v in enumerate(cm[c, :]):
+                toret[f'cm_{c}_{j}'] = v
+            toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2)
+            toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3)
+    return toret
