@@ -114,14 +114,14 @@ train_tf:
   model: distilbert
   submodel: distilbert-base-uncased
 
-  st_args:
-    num_train_epochs: 1
-    output_dir: tf_outputs
-    overwrite_output_dir: True
-    use_multiprocessing: False
-    use_multiprocessing_for_evaluation: False
-    learning_rate: 0.00004
-    train_batch_size: 8
+  # st_args
+  num_train_epochs: 1
+  output_dir: tf_outputs
+  overwrite_output_dir: True
+  use_multiprocessing: False
+  use_multiprocessing_for_evaluation: False
+  learning_rate: 0.00004
+  train_batch_size: 8
 
   objective_metric: mean_balanced_accuracy
   
@@ -144,8 +144,8 @@ test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
-  mlflow_source_experiment_name: QUAL_tf_manual
-  mlflow_run_id: a233305015ec413a9e160bce625b20ec
+  mlflow_source_experiment_name: QUAL_tf_tpe_100t_220923_130921
+  mlflow_run_id: 6d8f6dc95e524f72b344cb22cea182d5
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
@@ -157,10 +157,43 @@ test_tf:
 
 defaults:
   - override hydra/sweeper: optuna
-  - override hydra/sweeper/sampler: random
-  - override hydra/launcher: joblib
+  - override hydra/sweeper/sampler: tpe # random
+  # - override hydra/launcher: joblib # 
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
+
+hydra:
+  sweeper:
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 43
+      consider_prior: true
+      prior_weight: 1.0
+      consider_magic_clip: true
+      consider_endpoints: false
+      n_startup_trials: 10 # TODO
+      n_ei_candidates: 24
+      multivariate: false
+      warn_independent_sampling: true
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    direction: maximize
+    study_name: test_study
+    storage: null
+    n_trials: 100
+    # max_failure_rate: 1.0
+    n_jobs: 1
+    params:
+      train_tf.num_train_epochs: choice(1,2,3)
+      train_tf.output_dir: tf_outputs
+      train_tf.overwrite_output_dir: True
+      train_tf.use_multiprocessing: False
+      train_tf.use_multiprocessing_for_evaluation: False
+      train_tf.learning_rate: interval(0.000004, 0.0004)
+      train_tf.train_batch_size: choice(8,16,32)
+      train_tf.do_replacement: choice(True, False)
+      train_tf.aug_factor: interval(1.0, 2.0) # float, the multiplier for the whole dataset
+      train_tf.match_factor: interval(0.5, 1.0)
+      train_tf.mlflow_experiment_name: tf_sweep_testing
 
 # hydra:
 #   sweeper:
@@ -169,40 +202,28 @@ defaults:
 #     direction: maximize
 #     study_name: test_study
 #     storage: null
-#     n_trials: 10
-#     n_jobs: 1
+#     n_trials: 100
+#     n_jobs: 14
 #     params:
-      
-
-hydra:
-  sweeper:
-    sampler:
-      seed: 43
-    direction: maximize
-    study_name: test_study
-    storage: null
-    n_trials: 100
-    n_jobs: 14
-    params:
-      train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
-      train.model_c: choice(1,0.1,0.01,0.001,0.0001)
-      train.punct: choice(True, False)
-      train.pron: choice(True, False)
-      train.stop: choice(True, False)
-      train.lemma: choice(True, False)
-      train.ngram_min: 1
-      train.ngram_max: range(1,8)
-      train.max_df: interval(0.1, 1.0)
-      train.min_df: range(1,30)
-      train.token_count: choice(True, False)
-      train.pos_counts: choice(True, False)
-      train.ent_counts: choice(True, False)
-      train.vectors: choice(True, False)
-      train.class_weight: balanced,null
-      train.aug_factor: interval(1.0, 2.0)
-      train.match_factor: interval(0.25, 1.0)
-      train.spacy_prog: False
-      train.spacy_procs: 1
+#       train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
+#       train.model_c: choice(1,0.1,0.01,0.001,0.0001)
+#       train.punct: choice(True, False)
+#       train.pron: choice(True, False)
+#       train.stop: choice(True, False)
+#       train.lemma: choice(True, False)
+#       train.ngram_min: 1
+#       train.ngram_max: range(1,8)
+#       train.max_df: interval(0.1, 1.0)
+#       train.min_df: range(1,30)
+#       train.token_count: choice(True, False)
+#       train.pos_counts: choice(True, False)
+#       train.ent_counts: choice(True, False)
+#       train.vectors: choice(True, False)
+#       train.class_weight: balanced,null
+#       train.aug_factor: interval(1.0, 2.0)
+#       train.match_factor: interval(0.25, 1.0)
+#       train.spacy_prog: False
+#       train.spacy_procs: 1
 
 
 

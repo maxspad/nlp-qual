@@ -11,8 +11,9 @@ def main(sweep_name: str = typer.Argument('sweep'),
 
     now = datetime.datetime.now()
     now_str = now.strftime('%y%m%d_%H%M%S')
-    exp_name = sweep_name if not append_time else f'{now_str}_{sweep_name}'
-    fullcmd = ['python', '-m', 'src.models.train_new', '--multirun', f'train.mlflow_experiment_name={exp_name}']
+    exp_name = sweep_name if not append_time else f'{sweep_name}_{now_str}'
+    # fullcmd = ['python', '-m', 'src.models.train_new', '--multirun', f'train.mlflow_experiment_name={exp_name}']
+    fullcmd = ['python', '-m', 'src.models.train_tf', '--multirun', f'train_tf.mlflow_experiment_name={exp_name}']
     fullcmd += hydra_args
 
     print('Running:')

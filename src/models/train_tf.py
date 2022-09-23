@@ -95,14 +95,14 @@ def train_tf_model(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
     
 def fit_model(cfg: DictConfig, train_df):
         model_args = ClassificationArgs(
-            num_train_epochs=cfg.st_args.num_train_epochs,
-            output_dir=cfg.st_args.output_dir,
-            overwrite_output_dir=cfg.st_args.overwrite_output_dir,
-            use_multiprocessing=cfg.st_args.use_multiprocessing,
-            use_multiprocessing_for_evaluation=cfg.st_args.use_multiprocessing_for_evaluation,
+            num_train_epochs=cfg.num_train_epochs,
+            output_dir=cfg.output_dir,
+            overwrite_output_dir=cfg.overwrite_output_dir,
+            use_multiprocessing=cfg.use_multiprocessing,
+            use_multiprocessing_for_evaluation=cfg.use_multiprocessing_for_evaluation,
             manual_seed=cfg.random_state,
-            learning_rate=cfg.st_args.learning_rate,
-            train_batch_size=cfg.st_args.train_batch_size
+            learning_rate=cfg.learning_rate,
+            train_batch_size=cfg.train_batch_size
         )
         model = ClassificationModel(
             cfg.model,
