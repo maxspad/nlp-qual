@@ -39,21 +39,18 @@ def main(cfg : DictConfig):
 
     mlflow.set_experiment(experiment_name=cfg.mlflow_experiment_name)
     with mlflow.start_run():
+        log.info('Training transformer model...')
+        log.debug(f"Parameters:\n{OmegaConf.to_yaml(cfg)}")
+        mlflow.log_params(OmegaConf.to_object(cfg))
         splitter = ShuffleSplit(n_splits=cfg.n_splits, test_size=cfg.test_size, random_state=cfg.random_state)
         fold_results = []
         for train_idx, test_idx in splitter.split(X):
             Xtr, ytr = X[train_idx, :], y[train_idx]
             Xte, yte = X[test_idx, :], y[test_idx]
-            
-            Xtr, ytr = th.augment_train(cfg, Xtr, ytr)
-            log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
 
-            train_df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
+            model = train_tf_model(cfg, Xtr, ytr)
+
             test_df = pd.DataFrame({'text': Xte[:,0], 'labels': yte})
-            
-            log.info('Training model...')
-            model = fit_model(cfg, train_df)
-
             log.info('Evaluating model on this fold...')
             p, s = model.predict(test_df['text'].tolist())
             results = calculate_metrics(test_df['labels'].values, p, s)
@@ -74,17 +71,27 @@ def main(cfg : DictConfig):
         mlflow.log_artifact(cfg.conda_yaml_path)
         mlflow.log_artifact(CONF_FILE)
 
-        if cfg.fit_final:
-            log.info('Fitting final model...')
-            Xtr, ytr = th.augment_train(cfg, X, y)
-            log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
-            df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
-            model = fit_model(cfg, df)  
-            log.info('Saving final model...')
-            mlflow.log_artifact(cfg.st_args.output_dir)
+        # if cfg.fit_final:
+        #     log.info('Fitting final model...')
+        #     Xtr, ytr = th.augment_train(cfg, X, y)
+        #     log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
+        #     df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
+        #     model = fit_model(cfg, df)  
+        #     log.info('Saving final model...')
+        #     mlflow.log_artifact(cfg.st_args.output_dir)
 
         return res_mn[cfg.objective_metric]
-    
+
+def train_tf_model(cfg: DictConfig, Xtr: np.ndarray, ytr: np.ndarray):
+    Xtr, ytr = th.augment_train(cfg, Xtr, ytr)
+    log.info(f'Value counts after augmentation:\n{pd.Series(ytr).value_counts()}')
+
+    train_df = pd.DataFrame({'text': Xtr[:,0], 'labels': ytr})
+
+    log.info('Training model...')
+    model = fit_model(cfg, train_df)
+    return model
+
     
 def fit_model(cfg: DictConfig, train_df):
         model_args = ClassificationArgs(

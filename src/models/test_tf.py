@@ -19,6 +19,7 @@ import mlflow
 
 # training pipeline
 from . import train_helpers as th
+from . import train_tf as ttf
 from simpletransformers.classification import ClassificationArgs, ClassificationModel
 
 CONF_PATH = '../../'
@@ -31,12 +32,16 @@ def main(cfg : DictConfig):
     cfg = cfg.test_tf
     mlflow.set_tracking_uri(cfg.mlflow_tracking_dir)
 
-    # Load the trained model
+    # Load the model parameters from cross-validation
     exper = mlflow.get_experiment_by_name(cfg.mlflow_source_experiment_name)
     log.info(f'Loaded experiment {cfg.mlflow_source_experiment_name} with ID {exper.experiment_id} at artifact location {exper.artifact_location}')
-    model_loc = f'{cfg.mlflow_dir}/{exper.experiment_id}/{cfg.mlflow_run_id}/artifacts/tf_outputs'
-    log.info(f'Loading model from {model_loc}')
-    model = load_model(cfg, model_loc)
+    config_loc = f'{cfg.mlflow_dir}/{exper.experiment_id}/{cfg.mlflow_run_id}/artifacts/config.yaml'
+    train_cfg = OmegaConf.load(config_loc).train_tf
+    log.info(f'Loaded train configuration from {config_loc}')
+    log.info(f'Configuration is \n{train_cfg}')
+    
+    Xtr, ytr = th.load_data(train_cfg, train=True)
+    model = ttf.train_tf_model(train_cfg, Xtr, ytr)
     
     mlflow.set_experiment(experiment_name=cfg.mlflow_target_experiment_name)
     with mlflow.start_run():

@@ -26,7 +26,7 @@ split_train_test:
   output_dir: data/processed
   train_path: ${split_train_test.output_dir}/train.pkl
   test_path: ${split_train_test.output_dir}/test.pkl
-  test_size: 0.15
+  test_size: 0.2
   random_state: 43
   train_file_name: train.pkl
   test_file_name: test.pkl
@@ -145,7 +145,8 @@ test_tf:
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
   mlflow_source_experiment_name: QUAL_tf_manual
-  mlflow_run_id: 53fb03c2b24d496299b7b10fb94f5a30
+  mlflow_run_id: a233305015ec413a9e160bce625b20ec
+  train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
   target_var: ${train_tf.target_var}
