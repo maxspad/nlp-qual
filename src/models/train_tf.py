@@ -102,7 +102,11 @@ def fit_model(cfg: DictConfig, train_df):
             use_multiprocessing_for_evaluation=cfg.use_multiprocessing_for_evaluation,
             manual_seed=cfg.random_state,
             learning_rate=cfg.learning_rate,
-            train_batch_size=cfg.train_batch_size
+            train_batch_size=cfg.train_batch_size,
+            save_eval_checkpoints=cfg.save_eval_checkpoints,
+            save_model_every_epoch=cfg.save_model_every_epoch,
+            save_steps=cfg.save_steps,
+            max_seq_length=cfg.max_seq_length
         )
         model = ClassificationModel(
             cfg.model,

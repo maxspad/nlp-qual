@@ -111,8 +111,10 @@ train_tf:
   test_size: 0.25
   random_state: 43
 
-  model: distilbert
-  submodel: distilbert-base-uncased
+  model: bert
+  # submodel: bert-base-uncased
+  # submodel: allenai/scibert_scivocab_uncased
+  submodel: emilyalsentzer/Bio_ClinicalBERT
 
   # st_args
   num_train_epochs: 1
@@ -122,6 +124,10 @@ train_tf:
   use_multiprocessing_for_evaluation: False
   learning_rate: 0.00004
   train_batch_size: 8
+  save_eval_checkpoints: False
+  save_model_every_epoch: False
+  save_steps: -1
+  max_seq_length: 256
 
   objective_metric: mean_balanced_accuracy
   
@@ -144,8 +150,8 @@ test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
-  mlflow_source_experiment_name: QUAL_tf_tpe_100t_220923_130921
-  mlflow_run_id: 6d8f6dc95e524f72b344cb22cea182d5
+  mlflow_source_experiment_name: QUAL_tf_scibert-scivocab_uncased_seq256_tpe_100t_220923_164119
+  mlflow_run_id: e7958dff2a3e40618cf6d7cf05bd058b
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
@@ -166,7 +172,7 @@ hydra:
   sweeper:
     sampler:
       _target_: optuna.samplers.TPESampler
-      seed: 43
+      seed: 79
       consider_prior: true
       prior_weight: 1.0
       consider_magic_clip: true
