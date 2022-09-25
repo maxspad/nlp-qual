@@ -94,7 +94,7 @@ train_tf:
   mlflow_experiment_name: ${train_tf.target_var}_tf_manual
   train_path: ${split_train_test.train_path}
   text_var: comment
-  target_var: Q1  
+  target_var: Q2i  
   qual_exclude_level4: False
   invert_target: False
 
@@ -150,8 +150,8 @@ test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
-  mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_100t_220925_103506
-  mlflow_run_id: 76dd8fc760d446fe8765b33b9f6e8429
+  mlflow_source_experiment_name: Q2i_tf_bio-clinicalbert_tpe_100t_220925_121844
+  mlflow_run_id: 52e6735eafa542238a1fda2ee07c3b08
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
@@ -172,7 +172,7 @@ hydra:
   sweeper:
     sampler:
       _target_: optuna.samplers.TPESampler
-      seed: 265
+      seed: 397
       consider_prior: true
       prior_weight: 1.0
       consider_magic_clip: true
