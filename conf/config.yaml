@@ -150,8 +150,8 @@ test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
-  mlflow_source_experiment_name: QUAL_tf_scibert-scivocab_uncased_seq256_tpe_100t_220923_164119
-  mlflow_run_id: e7958dff2a3e40618cf6d7cf05bd058b
+  mlflow_source_experiment_name: QUAL_tf_bio-clinicalbert_tpe_1000t_220924_104547
+  mlflow_run_id: 046f731d3c6b4590acc2b9154ebc0e01
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
@@ -172,12 +172,12 @@ hydra:
   sweeper:
     sampler:
       _target_: optuna.samplers.TPESampler
-      seed: 79
+      seed: 43
       consider_prior: true
       prior_weight: 1.0
       consider_magic_clip: true
       consider_endpoints: false
-      n_startup_trials: 10 # TODO
+      n_startup_trials: 30 # TODO
       n_ei_candidates: 24
       multivariate: false
       warn_independent_sampling: true
@@ -185,7 +185,7 @@ hydra:
     direction: maximize
     study_name: test_study
     storage: null
-    n_trials: 100
+    n_trials: 1000
     # max_failure_rate: 1.0
     n_jobs: 1
     params:
@@ -200,6 +200,7 @@ hydra:
       train_tf.aug_factor: interval(1.0, 2.0) # float, the multiplier for the whole dataset
       train_tf.match_factor: interval(0.5, 1.0)
       train_tf.mlflow_experiment_name: tf_sweep_testing
+      train_tf.max_seq_length: 256
 
 # hydra:
 #   sweeper:
