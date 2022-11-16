@@ -161,6 +161,27 @@ test_tf:
   mlflow_target_experiment_name: ${train_tf.target_var}_tf_test
   conda_yaml_path: ${train_tf.conda_yaml_path}
 
+word_clouds:
+  mlflow_dir: ${train_tf.mlflow_dir}
+  mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
+  model: ${train_tf.model}
+  mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_1000t_220925_235140
+  mlflow_run_id: 60cc36a581b34e62b0814ac7f7169c49
+  train_path: ${split_train_test.train_path}
+  test_path: ${split_train_test.test_path}
+  text_var: ${train_tf.text_var}
+  target_var: ${train_tf.target_var}
+  invert_target: ${train_tf.invert_target}
+
+  wc_figsize_width: 10
+  wc_figsize_height: 5
+  wc_max_words: 500
+  wc_count_thresh: 10
+  wc_width: 800
+  wc_height: 400
+  wc_background_color: white
+  wc_colormap: Reds
+
 defaults:
   - override hydra/sweeper: optuna
   - override hydra/sweeper/sampler: tpe # random
