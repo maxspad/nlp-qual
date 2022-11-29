@@ -86,7 +86,7 @@ def main(cfg : DictConfig):
             n_skipped += 1
             continue
         else:
-            attribs = cls_explainer(comment, class_name='LABEL_1')
+            attribs = cls_explainer(comment, class_name=cfg.word_scores_label_target)
             for w, score in attribs:
                 try:
                     attrib_dict[w].append(score)

@@ -206,4 +206,9 @@ def tf_calculate_metrics(y, p, s):
                 toret[f'cm_{c}_{j}'] = v
             toret['top_2_acc'] = mets.top_k_accuracy_score(y, s, k=2)
             toret['top_3_acc'] = mets.top_k_accuracy_score(y, s, k=3)
+
+        # "within-1" accuracy
+        delta = np.abs(y - p)
+        within_one = np.sum(delta <= 1) / len(delta)
+        toret['within_one'] = within_one
     return toret
