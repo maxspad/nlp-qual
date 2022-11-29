@@ -165,13 +165,19 @@ word_clouds:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
-  mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_1000t_220925_235140
-  mlflow_run_id: 60cc36a581b34e62b0814ac7f7169c49
+  mlflow_source_experiment_name: Q2i_tf_bio-clinicalbert_tpe_100t_220925_121844
+  mlflow_run_id: 52e6735eafa542238a1fda2ee07c3b08
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
   target_var: ${train_tf.target_var}
   invert_target: ${train_tf.invert_target}
+
+  word_weight_len_thresh: 75
+
+  word_scores_csv_path: reports/word_weights_${word_clouds.mlflow_source_experiment_name}.csv
+  word_cloud_pos_path: reports/word_cloud_pos_${word_clouds.mlflow_source_experiment_name}.png
+  word_cloud_neg_path: reports/word_cloud_neg_${word_clouds.mlflow_source_experiment_name}.png
 
   wc_figsize_width: 10
   wc_figsize_height: 5
@@ -179,8 +185,10 @@ word_clouds:
   wc_count_thresh: 10
   wc_width: 800
   wc_height: 400
-  wc_background_color: white
-  wc_colormap: Reds
+  wc_background_color: black
+  wc_pos_colormap: Greens
+  wc_neg_colormap: Reds
+  wc_exclude_partwords: True
 
 defaults:
   - override hydra/sweeper: optuna
