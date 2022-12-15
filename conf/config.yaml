@@ -150,10 +150,22 @@ test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
   mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
   model: ${train_tf.model}
+  # QUAL Golden Model
   #mlflow_source_experiment_name: QUAL_tf_bio-clinicalbert_tpe_1000t_220924_104547
   #mlflow_run_id: 046f731d3c6b4590acc2b9154ebc0e01
-  mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_100t_220925_103506
-  mlflow_run_id: 76dd8fc760d446fe8765b33b9f6e8429
+  
+  # Q1 Golden Model
+  # mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_100t_220925_103506
+  # mlflow_run_id: 76dd8fc760d446fe8765b33b9f6e8429
+  
+  # Q2 Golden Model
+  # mlflow_source_experiment_name: Q2i_tf_bio-clinicalbert_tpe_100t_220925_121844
+  # mlflow_run_id: 52e6735eafa542238a1fda2ee07c3b08
+
+  # Q3 Golden Model
+  # mlflow_source_experiment_name: Q3i_tf_bio-clinicalbert_tpe_100t_220925_134605
+  # mlflow_run_id: 11a9e6dcc4794903b88de58e4ae5a6a5
+
   train_path: ${split_train_test.train_path}
   test_path: ${split_train_test.test_path}
   text_var: ${train_tf.text_var}
@@ -162,6 +174,40 @@ test_tf:
   qual_exclude_level4: ${train_tf.qual_exclude_level4}
   mlflow_target_experiment_name: ${train_tf.target_var}_tf_test
   conda_yaml_path: ${train_tf.conda_yaml_path}
+
+package_model:
+  mlflow_dir: ${train_tf.mlflow_dir}
+  mlflow_tracking_dir: ${train_tf.mlflow_tracking_dir}
+  model: ${train_tf.model}
+  # QUAL Golden Model
+  mlflow_source_experiment_name: QUAL_tf_bio-clinicalbert_tpe_1000t_220924_104547
+  mlflow_run_id: 046f731d3c6b4590acc2b9154ebc0e01
+  target_var: QUAL
+  
+  # Q1 Golden Model
+  # mlflow_source_experiment_name: Q1_tf_bio-clinicalbert_tpe_100t_220925_103506
+  # mlflow_run_id: 76dd8fc760d446fe8765b33b9f6e8429
+  # target_var: Q1
+  
+  # Q2 Golden Model
+  # mlflow_source_experiment_name: Q2i_tf_bio-clinicalbert_tpe_100t_220925_121844
+  # mlflow_run_id: 52e6735eafa542238a1fda2ee07c3b08
+  # target_var: Q2i
+
+  # Q3 Golden Model
+  # mlflow_source_experiment_name: Q3i_tf_bio-clinicalbert_tpe_100t_220925_134605
+  # mlflow_run_id: 11a9e6dcc4794903b88de58e4ae5a6a5
+  # target_var: Q3i
+
+  train_path: ${split_train_test.train_path}
+  test_path: ${split_train_test.test_path}
+  text_var: ${train_tf.text_var}
+  invert_target: ${train_tf.invert_target}
+  qual_exclude_level4: ${train_tf.qual_exclude_level4}
+  mlflow_target_experiment_name: ${train_tf.target_var}_tf_test
+  conda_yaml_path: ${train_tf.conda_yaml_path}
+
+  model_save_path: models/${package_model.target_var}/
 
 word_clouds:
   mlflow_dir: ${train_tf.mlflow_dir}
