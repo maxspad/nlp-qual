@@ -1,0 +1,15 @@
+[submodule "demo/qual-test-space"]
+	path = demo/qual-test-space
+	url = https://huggingface.co/spaces/maxspad/qual-test-space
+[submodule "models/hfrepos/nlp-qual-q1"]
+	path = models/hfrepos/nlp-qual-q1
+	url = https://huggingface.co/maxspad/nlp-qual-q1
+[submodule "models/hfrepos/nlp-qual-q2i"]
+	path = models/hfrepos/nlp-qual-q2i
+	url = https://huggingface.co/maxspad/nlp-qual-q2i
+[submodule "models/hfrepos/nlp-qual-q3i"]
+	path = models/hfrepos/nlp-qual-q3i
+	url = https://huggingface.co/maxspad/nlp-qual-q3i
+[submodule "models/hfrepos/nlp-qual-qual"]
+	path = models/hfrepos/nlp-qual-qual
+	url = https://huggingface.co/maxspad/nlp-qual-qual
