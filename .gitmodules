@@ -13,3 +13,9 @@
 [submodule "models/hfrepos/nlp-qual-qual"]
 	path = models/hfrepos/nlp-qual-qual
 	url = https://huggingface.co/maxspad/nlp-qual-qual
+[submodule "demo/nlp-qual-space"]
+	path = demo/nlp-qual-space
+	url = https://huggingface.co/spaces/maxspad/nlp-qual-space
+[submodule "demo/nlp-qual-demo"]
+	path = demo/nlp-qual-demo
+	url = git@github.com:maxspad/nlp-qual-demo.git
