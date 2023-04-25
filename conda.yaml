@@ -34,4 +34,5 @@ dependencies:
     - prettytable==3.3.0
     - pyperclip==1.8.2
     - stevedore==3.5.0
+    - transformers-interpret==0.10.0
 prefix: /home/maxspad/mambaforge/envs/nlp-qual-max
