@@ -45,3 +45,9 @@ transformers==4.27.4
 transformers-interpret==0.10.0
 tzlocal==4.3
 validators==0.20.0
+hydra-core
+hydra_colorlog
+hydra-optuna-sweeper
+nlpaug
+simpletransformers
+nltk

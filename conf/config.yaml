@@ -72,6 +72,7 @@ train_tf:
   save_model_every_epoch: False
   save_steps: -1
   max_seq_length: 256
+  use_cuda: true
 
   objective_metric: mean_balanced_accuracy
 

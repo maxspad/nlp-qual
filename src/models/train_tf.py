@@ -106,13 +106,14 @@ def fit_model(cfg: DictConfig, train_df):
             save_eval_checkpoints=cfg.save_eval_checkpoints,
             save_model_every_epoch=cfg.save_model_every_epoch,
             save_steps=cfg.save_steps,
-            max_seq_length=cfg.max_seq_length
+            max_seq_length=cfg.max_seq_length,
         )
         model = ClassificationModel(
             cfg.model,
             cfg.submodel,
             args=model_args,
-            num_labels=len(train_df.labels.unique())
+            num_labels=len(train_df.labels.unique()),
+            use_cuda=cfg.use_cuda
         )
         model.train_model(train_df)
         return model
