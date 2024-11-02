@@ -31,62 +31,6 @@ split_train_test:
   train_file_name: train.pkl
   test_file_name: test.pkl
 
-train:
-  # input/output configuration
-  mlflow_dir: mlruns
-  conda_yaml_path: './conda.yaml'
-  mlflow_tracking_dir: ./mlruns
-  mlflow_experiment_name: ${train.target_var}_manual
-  train_path: ${split_train_test.train_path}
-  text_var: comment
-  random_seed: 43
-  # text_var: ${proc_spacy.text_var}_spacy
-
-  # target variable options
-  target_var: QUAL
-  invert_target: False
-  qual_exclude_level4: False
-
-  # spacy-specific processing options
-  spacy_prog: True
-  spacy_procs: 12
-
-  # cross-validation options
-  cv_folds: 5
-  
-  # augmentation options
-  do_aug: True
-  aug_factor: 1.0 # float, the multiplier for the whole dataset
-  match_factor: 0.25 # float, the fraction of the most frequent class that the rarer classes are upsampled to
-  
-  # hyperparams
-  punct: True
-  pron: True
-  stop: False
-  lemma: False
-  ngram_min: 1
-  ngram_max: 2
-  max_df: 1.0
-  min_df: 1
-  token_count: True
-  pos_counts: False
-  ent_counts: False
-  vectors: False
-  model_c: 0.01
-  max_iter: 10000
-  class_weight: balanced
-
-  # QUAL-specific metrics
-  q1_mlflow_exp_name: 220913_114531_Q1_1000t
-  q1_mlflow_run_id: c9882bab307e4452bd09166e4d059fcc
-  q2_mlflow_exp_name: 220913_122406_Q2i_1000t
-  q2_mlflow_run_id: c6f0a55bdb2c463fb159b0e3e8d42024
-  q3_mlflow_exp_name: 220913_124429_Q3i_1000t
-  q3_mlflow_run_id: 1cc2ead791d341cc8445317fbe9bf3ad
-  qual_text_mlflow_exp_name: QUAL_manual
-  qual_text_mlflow_run_id: e1a1cb95017a499b81f2335c0733ec48
-  qual_fit_type: 'text_only' # text_only/submodels_only/simultaneous/text_first/simple_sum
-
 train_tf:
   mlflow_dir: mlruns
   conda_yaml_path: './conda.yaml'
@@ -130,21 +74,6 @@ train_tf:
   max_seq_length: 256
 
   objective_metric: mean_balanced_accuracy
-  
-
-test:
-  mlflow_dir: ${train.mlflow_dir}
-  mlflow_source_experiment_name: QUAL_manual
-  mlflow_run_id: da867755527246ad87cb1111f4fa1f51
-  test_path: ${split_train_test.test_path}
-  text_var: ${train.text_var}
-  target_var: ${train.target_var}
-  invert_target: ${train.invert_target}
-  qual_exclude_level4: ${train.qual_exclude_level4}
-  mlflow_target_experiment_name: ${train.target_var}_test
-  conda_yaml_path: ${train.conda_yaml_path}
-  posthoc: True
-  n_top: 15
 
 test_tf:
   mlflow_dir: ${train_tf.mlflow_dir}
@@ -282,35 +211,6 @@ hydra:
       train_tf.mlflow_experiment_name: tf_sweep_testing
       train_tf.max_seq_length: 256
 
-# hydra:
-#   sweeper:
-#     sampler:
-#       seed: 43
-#     direction: maximize
-#     study_name: test_study
-#     storage: null
-#     n_trials: 100
-#     n_jobs: 14
-#     params:
-#       train.mlflow_experiment_name: sweep_random_100_test_yes_vectors
-#       train.model_c: choice(1,0.1,0.01,0.001,0.0001)
-#       train.punct: choice(True, False)
-#       train.pron: choice(True, False)
-#       train.stop: choice(True, False)
-#       train.lemma: choice(True, False)
-#       train.ngram_min: 1
-#       train.ngram_max: range(1,8)
-#       train.max_df: interval(0.1, 1.0)
-#       train.min_df: range(1,30)
-#       train.token_count: choice(True, False)
-#       train.pos_counts: choice(True, False)
-#       train.ent_counts: choice(True, False)
-#       train.vectors: choice(True, False)
-#       train.class_weight: balanced,null
-#       train.aug_factor: interval(1.0, 2.0)
-#       train.match_factor: interval(0.25, 1.0)
-#       train.spacy_prog: False
-#       train.spacy_procs: 1
 
 
 
